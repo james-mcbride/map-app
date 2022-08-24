@@ -1,55 +1,45 @@
 package com.trippyTravel;
 
-import com.trippyTravel.services.UserDetailsLoader;
-import com.trippyTravel.services.UserWithRoles;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
-@EnableWebSecurity
-@ComponentScan(basePackageClasses = UserWithRoles.class)
-public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
+public class WebConfig extends WebSecurityConfigurerAdapter {
 
-    @Autowired
-    private UserDetailsLoader userDetails;
-
-    @Bean(name = "passwordEncoder")
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+    @Bean
+    @Override
+    public AuthenticationManager authenticationManager() throws Exception {
+        return super.authenticationManager();
     }
 
     @Override
-    protected void configure(HttpSecurity http) throws Exception {
+    public void configure(HttpSecurity http) throws Exception {
         http
-                .formLogin()
-                    .loginPage("/login")
-                    .defaultSuccessUrl("/") // user's home page, it can be any URL
-                    .permitAll() // Anyone can go to the login page
+                .cors()
                 .and()
-                    .authorizeRequests()
-                    .antMatchers("/", "/logout") // anyone can see the home and logout page
-                    .permitAll()
+                .requestMatchers()
+                .antMatchers("/login", "/logout", "/oauth/authorize")
                 .and()
-                    .logout()
-                    .logoutSuccessUrl("/login?logout") // append a query string value
+                .logout()
+                .deleteCookies("JSESSIONID")
+                .permitAll()
                 .and()
-                    .authorizeRequests()
-                    .antMatchers("/groups/create", "/groups/{id}", "/trip/create", "/trip/{id}", "/trip/{id}/edit", "/show") // only authenticated users can visit this urls
-                    .authenticated()
-        .and().csrf().disable()
-        ;
+                .authorizeRequests()
+                .anyRequest()
+                .authenticated()
+                .and()
+                .csrf()
+                .disable();
+
+
     }
 
-    @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userDetails).passwordEncoder(passwordEncoder());
-    }
+
 }
