@@ -1,7 +1,6 @@
 package com.trippyTravel.models;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
@@ -15,76 +14,66 @@ public class Trip {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "trip")
+    @JsonBackReference
+    private List<Image> images;
+
     @Column(nullable = false, length = 250)
     private String location;
 
     @Column(nullable = false, length = 250)
     private String name;
 
-    @Column(nullable = false, length = 250)
-    private String status;
-
     @Column(columnDefinition = "TEXT")
     private String description;
-
-    @Column
-    private String visibility;
 
     @Column(columnDefinition = "TEXT")
     private String trip_profile_image;
 
     @Column(name = "start_date")
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private Date startDate;
+    private String startDate;
 
     @Column(name = "end_date")
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private Date endDate;
+    private String endDate;
 
-    @ManyToOne
-    @JsonManagedReference
-    @JoinColumn(name = "group_id")
-    private Group group;
+    public List<User> getUsers() {
+        return users;
+    }
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "trip")
-    @JsonBackReference
-    private List<Image> images;
+    public void setUsers(List<User> users) {
+        this.users = users;
+    }
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "trip")
     @JsonBackReference
-    private List<Comment> comments;
+    private List<User> users;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "trip")
     @JsonBackReference
-    private List<TripLikes> tripLikes;
-
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "trip")
-    @JsonBackReference
-    private List<Activity> activities;
-
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "unreadCommentTrip")
-    @JsonBackReference
-    private List<GroupMember> groupMembers;
-
+    private List<Location> locations;
 
     public Trip() {
     }
 
-    public Trip(String location, String name, String status, String description, String visibility, String trip_profile_image, Date startDate, Date endDate, Group group, List<Image> images, List<Comment> comments, List<TripLikes> tripLikes, List<Activity> activities, List<GroupMember> groupMembers) {
+    public Trip(Long id) {
+        this.id = id;
+    }
+    public Trip(String location, String name, String startDate, String endDate) {
         this.location = location;
         this.name = name;
-        this.status = status;
+        this.startDate = startDate;
+        this.endDate = endDate;
+    }
+
+    public Trip(String location, String name, String description, String trip_profile_image, String startDate, String endDate, List<User> users, List<Image> images) {
+        this.location = location;
+        this.name = name;
         this.description = description;
-        this.visibility = visibility;
         this.trip_profile_image = trip_profile_image;
         this.startDate = startDate;
         this.endDate = endDate;
-        this.group = group;
+        this.users = users;
         this.images = images;
-        this.comments = comments;
-        this.tripLikes = tripLikes;
-        this.activities = activities;
-        this.groupMembers = groupMembers;
     }
 
     public long getId() { return id; }
@@ -99,52 +88,29 @@ public class Trip {
 
     public void setName(String name) { this.name = name; }
 
-    public String getStatus() { return status; }
-
-    public void setStatus(String status) { this.status = status; }
 
     public String getDescription() { return description; }
 
     public void setDescription(String description) { this.description = description; }
 
-    public Date getStartDate() { return startDate; }
+    public String getStartDate() { return startDate; }
 
-    public void setStartDate(Date startDate) { this.startDate = startDate; }
+    public void setStartDate(String startDate) { this.startDate = startDate; }
 
-    public Date getEndDate() { return endDate; }
+    public String getEndDate() { return endDate; }
 
-    public void setEndDate(Date endDate) { this.endDate = endDate; }
-
-    public Group getGroup() { return group; }
-
-    public void setGroup(Group group) { this.group = group; }
-
-    public List<Image> getImages() { return images; }
-
-    public void setImages(List<Image> images) { this.images = images; }
-
-    public List<Comment> getComments() { return comments; }
-
-    public void setComments(List<Comment> comments) { this.comments = comments; }
-
-    public String getVisibility() { return visibility; }
-
-    public void setVisibility(String visibility) { this.visibility = visibility; }
+    public void setEndDate(String endDate) { this.endDate = endDate; }
 
     public String getTrip_profile_image() { return trip_profile_image; }
 
     public void setTrip_profile_image(String trip_profile_image) { this.trip_profile_image = trip_profile_image; }
 
-    public List<GroupMember> getGroupMembers() { return groupMembers; }
+    public List<Image> getImages() {
+        return images;
+    }
 
-    public void setGroupMembers(List<GroupMember> groupMembers) { this.groupMembers = groupMembers; }
-
-    public List<Activity> getActivities() { return activities; }
-
-    public void setActivities(List<Activity> activities) { this.activities = activities; }
-
-    public List<TripLikes> getTripLikes() { return tripLikes; }
-
-    public void setTripLikes(List<TripLikes> tripLikes) { this.tripLikes = tripLikes; }
+    public void setImages(List<Image> images) {
+        this.images = images;
+    }
 
 }

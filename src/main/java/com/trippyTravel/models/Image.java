@@ -18,43 +18,46 @@ public class Image {
     private User user;
 
     @ManyToOne
+    @JoinColumn(name = "location_id")
+    @JsonManagedReference
+    private Location location;
+
+    @ManyToOne
     @JoinColumn(name = "trip_id")
     @JsonManagedReference
     private Trip trip;
 
-    @ManyToOne (optional = true)
-    @JoinColumn( name= "activity_id")
-    @JsonManagedReference
-    private Activity activity;
-
-    @Column( name= "image_url", columnDefinition = "text")
-    private String image_url;
+    @Column( name= "image_location", columnDefinition = "text")
+    private String image_location;
 
     @Column(columnDefinition = "text")
     private String description;
 
     public Image(){}
 
-    public Image(String imgUrl, User user, Trip trip){
-    this.image_url=imgUrl;
+    public Image(String imgUrl, User user, Location location){
+    this.image_location=imgUrl;
     this.user=user;
-    this.trip=trip;
+    this.location=location;
 }
 
-    public Image(long id, User user, Trip trip, Activity activity, String image_url) {
+public Image(Trip trip) {
+        this.trip = trip;
+}
+
+    public Image(long id, User user, Location location, String image_location) {
         this.id = id;
         this.user = user;
-        this.trip = trip;
-        this.activity = activity;
-        this.image_url = image_url;
+        this.location = location;
+        this.image_location = image_location;
     }
 
-    public Image(User user, Trip trip, Activity activity, String image_url, String description) {
+    public Image(User user, Location location, String image_location, String description, Trip trip) {
         this.user = user;
-        this.trip = trip;
-        this.activity = activity;
-        this.image_url = image_url;
+        this.location = location;
+        this.image_location = image_location;
         this.description = description;
+        this.trip = trip;
     }
 
     public long getId() { return id; }
@@ -65,29 +68,23 @@ public class Image {
 
     public void setUser(User user) { this.user = user; }
 
-    public Trip getTrip() { return trip; }
-
-    public void setTrip(Trip trip) {
-        this.trip = trip;
+    public String getImage_location() {
+        return image_location;
     }
 
-    public Activity getActivity() {
-        return activity;
-    }
-
-    public void setActivity(Activity activity) {
-        this.activity = activity;
-    }
-
-    public String getImage_url() {
-        return image_url;
-    }
-
-    public void setImage_url(String image_url) {
-        this.image_url = image_url;
+    public void setImage_location(String image_location) {
+        this.image_location = image_location;
     }
 
     public String getDescription() { return description; }
 
     public void setDescription(String description) { this.description = description; }
+
+    public Trip getTrip() {
+        return trip;
+    }
+
+    public void setTrip(Trip trip) {
+        this.trip = trip;
+    }
 }

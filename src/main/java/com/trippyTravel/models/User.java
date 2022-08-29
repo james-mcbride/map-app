@@ -2,6 +2,7 @@ package com.trippyTravel.models;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
@@ -43,36 +44,20 @@ public class User {
     @Column(columnDefinition = "TEXT")
     private String profile_image;
 
-    @OneToMany(cascade = CascadeType.ALL,mappedBy = "user")
-    @JsonBackReference
-    private List<FriendList> friends;
-
-
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "member")
-    @JsonBackReference
-    private List<GroupMember> groupMember;
-
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
     @JsonBackReference
     private List<Image> images;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
-    @JsonBackReference
-    private List<Comment> comments;
-
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
-    @JsonBackReference
-    private List<TripLikes> tripLikes;
-
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
-    @JsonBackReference
-    private List<CommentReplies> commentReplies;
+    @ManyToOne
+    @JoinColumn(name = "trip_id")
+    @JsonManagedReference
+    private Trip trip;
 
 
     public User() {
     }
 
-    public User(@NotBlank(message = "Username can't be empty") String username, String firstName, String lastName, String description, @Email(message = "Invalid email") @NotBlank(message = "Email can't be empty") String email, @NotBlank(message = "Password can't be empty") String password, String profile_image, List<FriendList> friends, List<GroupMember> groupMember, List<Image> images, List<Comment> comments, List<CommentReplies> commentReplies, List<TripLikes> tripLikes) {
+    public User(@NotBlank(message = "Username can't be empty") String username, String firstName, String lastName, String description, @Email(message = "Invalid email") @NotBlank(message = "Email can't be empty") String email, @NotBlank(message = "Password can't be empty") String password, String profile_image, List<Image> images) {
         this.username = username;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -80,12 +65,7 @@ public class User {
         this.email = email;
         this.password = password;
         this.profile_image = profile_image;
-        this.friends = friends;
-        this.groupMember = groupMember;
         this.images = images;
-        this.comments = comments;
-        this.commentReplies = commentReplies;
-        this.tripLikes =tripLikes;
     }
 
     // Copy constructor an alternative for clone
@@ -127,13 +107,6 @@ public class User {
 
     public void setProfile_image(String profile_image) { this.profile_image = profile_image; }
 
-    public List<FriendList> getFriends() { return friends; }
-
-    public void setFriends(List<FriendList> friends) { this.friends = friends; }
-
-    public List<GroupMember> getGroupMember() { return groupMember; }
-
-    public void setGroupMember(List<GroupMember> groupMember) { this.groupMember = groupMember; }
 
     public List<Image> getImages() { return images; }
 
@@ -142,14 +115,6 @@ public class User {
     public String getDescription() { return description; }
 
     public void setDescription(String description) { this.description = description; }
-
-    public List<Comment> getComments() { return comments; }
-
-    public void setComments(List<Comment> Comments) { this.comments = Comments; }
-
-    public List<CommentReplies> getCommentReplies() { return commentReplies; }
-
-    public void setCommentReplies(List<CommentReplies> commentReplies) { this.commentReplies = commentReplies; }
 
     @Override
     public String toString() {
@@ -166,7 +131,4 @@ public class User {
 
     public String friendStatus = "not friends";
 
-    public List<TripLikes> getTripLikes() { return tripLikes; }
-
-    public void setTripLikes(List<TripLikes> tripLikes) { this.tripLikes = tripLikes; }
 }

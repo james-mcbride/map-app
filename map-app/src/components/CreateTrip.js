@@ -12,7 +12,7 @@ function CreateTrip() {
 
 
     const submitTrip = () => {
-        axios.post("http://192.168.86.46:8090/trip/create", {
+        axios.post("http://10.0.0.135:8090/trip/create", {
                 name: name,
                 location: location,
                 startDate: startDate,

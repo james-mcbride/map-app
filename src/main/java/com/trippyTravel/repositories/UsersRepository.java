@@ -16,13 +16,11 @@ UsersRepository extends JpaRepository<User, Long> {
     User findByUsername(String username);
     User findByEmail(String email);
 
-    //Same function of above but with HQL
     @Query("select u from User u where u.email = ?1")
     User findByEmailQuery(String email);
 
     List<User> findByFirstNameContainingOrLastNameContainingOrUsernameContaining(String name, String name1, String name2);
 
-//    @Query("select u.username from User u where u.email = ?2")
     User findUserByEmail(String email);
 
 

@@ -15,7 +15,7 @@ function App() {
                     <Trips/>
                 </Route>
                 <Route exact path="/create">
-                    <CreateTrip/>
+                    <ViewTrip />
                 </Route>
                 <Route exact path="/trip/:id">
                     <ViewTrip />

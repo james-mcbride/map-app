@@ -1,12 +1,94 @@
 #tripInfo {
-  width: 30%;
-  input {
-    width: 250px;
-    margin: 10px;
+  display: flex;
+  flex-wrap: wrap;
 
+  input {
+    margin: 10px;
   }
+
+  margin-bottom: 25px;
 }
 
 .createTrip {
   display: flex;
+}
+
+#submit-trip-button {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+}
+
+#view-trip-header {
+  position: relative;
+  display: flex;
+  justify-content: center;
+}
+
+#view-trip-images {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.view-trip-image-div {
+  padding: 1px;
+}
+
+@media screen and (min-width: 300px) {
+
+  .trip-info-input {
+    width: 150px;
+  }
+
+  .view-trip-image {
+    width: 49vw;
+    height: 49vw;
+    object-fit: cover;
+  }
+
+}
+
+@media screen and (min-width: 800px) {
+
+
+  .trip-info-input {
+    width: 250px;
+  }
+
+  .view-trip-image {
+    width: 32vw;
+    height: 32vw;
+    object-fit: cover;
+  }
+}
+
+.view-trip-image {
+  opacity: 1;
+}
+
+.view-trip-image:hover {
+  opacity: 0.5;
+}
+
+#view-image-modal{
+  img {
+    height:75%;
+    object-fit: contain;
+  }
+  #close-image-modal-button {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+  }
+}
+#view-image-modal-div {
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  position: relative;
+  z-index: 3;
+}
+
+.ReactModal__Overlay {
+  z-index: 3;
 }
