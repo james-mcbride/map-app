@@ -32,25 +32,11 @@ public class TripController {
     @CrossOrigin
     @RequestMapping(value="/trip", method=RequestMethod.GET, produces="application/json")
     public @ResponseBody List<Trip> retrieveAllTrips() {
-        return tripRepository.findAll();
+        List<Trip> trips = tripRepository.findAll();
+        return trips;
     }
 
-    @CrossOrigin
-    @RequestMapping(value="/trip/{id}/images", method=RequestMethod.GET, produces="application/json")
-    public @ResponseBody List<Image> retrieveTripImage(@PathVariable long id) throws IOException {
-        List<Image> images = imagesRepository.findImagesByTrip(new Trip(id));
-        if (images.size() <=5) {
-            for (int i =0; i<images.size(); i = i+1) {
-                Image image = images.get(i);
-                Path destinationFIle = Paths.get("/Users/jimmiemcbride/Pictures/mapapp", String.format("%s.jpeg", Long.toString(image.getId())));
-                byte[] imageBytes = Files.readAllBytes(destinationFIle);
-                String encodedImage = Base64.encodeBase64String(imageBytes);
-                image.setImage_location(encodedImage);
-                images.set(i, image);
-            }
-        }
-        return images;
-    }
+
 
     @CrossOrigin
     @RequestMapping(value="/trip/{id}", method=RequestMethod.GET, produces="application/json")
@@ -58,16 +44,6 @@ public class TripController {
         return tripRepository.getOne(id);
     }
 
-    @CrossOrigin
-    @RequestMapping(value="/image/{id}", method=RequestMethod.GET, produces="application/json")
-    public @ResponseBody Image retrieveImageById(@PathVariable long id) throws IOException {
-        Image image = imagesRepository.getOne(id);
-        Path destinationFIle = Paths.get("/Users/jimmiemcbride/Pictures/mapapp", String.format("%s.jpeg", Long.toString(image.getId())));
-        byte[] imageBytes = Files.readAllBytes(destinationFIle);
-        String encodedImage = Base64.encodeBase64String(imageBytes);
-        image.setImage_location(encodedImage);
-        return image;
-    }
 
     @CrossOrigin
     @RequestMapping(value="/trip/create", method=RequestMethod.POST, produces="application/json")
@@ -88,17 +64,6 @@ public class TripController {
         return tripRepository.save(tripFromDb);
     }
 
-    @CrossOrigin
-    @RequestMapping(value="/trip/{id}/images", method=RequestMethod.POST, produces="application/json")
-    public @ResponseBody void saveImages(@PathVariable long id, @RequestBody HashMap<String, Object> data, HttpServletRequest httpServletRequest) throws IOException {
-        System.out.println("saving image");
-        Trip trip= tripRepository.getOne(id);
-        Image image = imagesRepository.save(new Image(trip));
-        byte[] decodedImage = Base64.decodeBase64((String) data.get("image"));
-        Path destinationFIle = Paths.get("/Users/jimmiemcbride/Pictures/mapapp", String.format("%s.jpeg", Long.toString(image.getId())));
-        Files.write(destinationFIle, decodedImage);
-
-    }
 
 
 }

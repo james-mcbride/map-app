@@ -72,7 +72,7 @@
 
 #view-image-modal{
   img {
-    height:75%;
+    height:100%;
     object-fit: contain;
   }
   #close-image-modal-button {
@@ -82,7 +82,7 @@
   }
 }
 #view-image-modal-div {
-  height: 100%;
+  height: 75%;
   display: flex;
   justify-content: center;
   position: relative;
@@ -91,4 +91,24 @@
 
 .ReactModal__Overlay {
   z-index: 3;
+}
+
+#image-modal-input {
+  margin-top: 20px;
+  input {
+    margin-left: 10px;
+    width: 300px;
+  }
+  display: flex;
+  justify-content: center;
+}
+
+#save-image-div {
+  display: flex;
+  justify-content: space-evenly;
+  width: 400px;
+  margin: 10px auto;
+  button {
+    margin: 0 10px;
+  }
 }

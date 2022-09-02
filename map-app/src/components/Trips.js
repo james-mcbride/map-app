@@ -4,7 +4,7 @@ import axios from "axios";
 function Trips(){
     const [trips, setTrips] = useState([])
     useEffect(() => {
-        axios.get('http://10.0.0.135:8090/trip')
+        axios.get('http://192.168.86.46:8090/trip')
             .then(response => setTrips(response.data))
     }, [])
     const showTrips = () => {

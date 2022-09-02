@@ -17,14 +17,14 @@ function ViewTrip({}) {
 
     useEffect(() => {
         if (tripId) {
-            axios.get(`http://10.0.0.135:8090/trip/${tripId}`)
+            axios.get(`http://192.168.86.46:8090/trip/${tripId}`)
                 .then(response => {
                     setLocation(response.data.location)
                     setName(response.data.name)
                     setStartDate(response.data.startDate.split(" ")[0])
                     setEndDate(response.data.endDate.split(" ")[0])
                 })
-            axios.get(`http://10.0.0.135:8090/trip/${tripId}/images`)
+            axios.get(`http://192.168.86.46:8090/trip/${tripId}/images`)
                 .then(response => {
                     if (response.data.length <= 5) {
                         setImages(response.data);
@@ -37,7 +37,7 @@ function ViewTrip({}) {
 
     function retrieveImage(imageList, index) {
         if (index < imageList.length) {
-            axios.get(`http://10.0.0.135:8090/image/${imageList[index].id}`)
+            axios.get(`http://192.168.86.46:8090/image/${imageList[index].id}`)
                 .then(response => {
                     imageList[index].image_location = response.data.image_location
                     setImages(imageList)
@@ -54,7 +54,7 @@ function ViewTrip({}) {
 
     const submitTrip = () => {
         if (tripId) {
-            axios.put("http://10.0.0.135:8090/trip/create", {
+            axios.put("http://192.168.86.46:8090/trip/create", {
                 name: name,
                 location: location,
                 startDate: startDate,
@@ -69,7 +69,7 @@ function ViewTrip({}) {
                 console.log("Request complete! response:", res);
             });
         } else {
-            axios.post("http://10.0.0.135:8090/trip/create", {
+            axios.post("http://192.168.86.46:8090/trip/create", {
                 name: name,
                 location: location,
                 startDate: startDate,
@@ -95,7 +95,7 @@ function ViewTrip({}) {
         reader.onloadend = function () {
             loadedImages.push(reader.result)
             setImages(loadedImages)
-            axios.post(`http://10.0.0.135:8090/trip/${tripId}/images`, {
+            axios.post(`http://192.168.86.46:8090/trip/${tripId}/images`, {
                 image: reader.result.split(",")[1]
             })
             index += 1
@@ -104,6 +104,21 @@ function ViewTrip({}) {
             }
         }
         reader.readAsDataURL(newFiles[0])
+    }
+
+    const closeImageModal = (updatedImage, action) => {
+        setOpen(false);
+        setModalImage(null)
+        if (action === "update") {
+            const updatedImages = images.map(image => {
+                image.trip.trip_profile_image = updatedImage.id
+                return image;
+            })
+            setImages(updatedImages)
+        } else if (action === "delete") {
+            const updatedImages = images.filter(image => image.id !== updatedImage.id)
+            setImages(updatedImages)
+        }
     }
 
     const displayImages = images.filter(image => image.image_location).map(image => {
@@ -168,10 +183,7 @@ function ViewTrip({}) {
             {tripId && (<div id="view-trip-images">
                 {displayImages}
             </div>)}
-            <ImageModal modalImage={modalImage} open={open} onClose={() => {
-                setOpen(false);
-                setModalImage(null)
-            }} />
+            <ImageModal modalImage={modalImage} open={open} onClose={closeImageModal} />
         </div>
     )
 }
