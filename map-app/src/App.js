@@ -1,7 +1,5 @@
-import logo from './logo.svg';
-// import './App.scss';
-import CreateTrip from "./components/CreateTrip";
 import React from "react";
+import { browserHistory } from 'react-router';
 import {BrowserRouter, Route, Redirect, Link} from 'react-router-dom'
 import Trips from "./components/Trips";
 import ViewTrip from "./components/ViewTrip";

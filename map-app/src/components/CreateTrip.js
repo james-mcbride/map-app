@@ -2,7 +2,7 @@ import React, {useState, useEffect} from 'react'
 import '../App.scss'
 import Map from './Map'
 import axios from 'axios'
-
+import { browserHistory } from 'react-router';
 
 function CreateTrip() {
     const [name, setName] = useState('');
@@ -26,6 +26,7 @@ function CreateTrip() {
             }
         }).then(res => {
             console.log("Request complete! response:", res);
+            window.location.replace(`http://192.168.86.46:3000/trip/${res.data.id}`);
         });
     }
 

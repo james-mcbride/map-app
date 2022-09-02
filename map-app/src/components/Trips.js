@@ -11,10 +11,15 @@ function Trips(){
         return trips.map(trip => {
          return (
              <div className="trip-tile">
-                 <h3>{trip.name}</h3>
-                 <h4>{trip.location}</h4>
-                 <h5>{`${trip.startDate.split(" ")[0]} - ${trip.endDate.split(" ")[0]}`}</h5>
-                 <a href={`/trip/${trip.id}`}><button>Edit Trip</button></a>
+                 <div className="trip-tile-main">
+                 <div className="trip-profile-image"><img src={`data:image/jpeg;base64,${trip?.trip_profile_image}`}/></div>
+                 <div>
+                     <h2>{trip.name}</h2>
+                     <h4>{trip.location}</h4>
+                     <h5>{`${trip.startDate.split(" ")[0]} - ${trip.endDate.split(" ")[0]}`}</h5>
+                     <a href={`/trip/${trip.id}`}><button>Edit Trip</button></a>
+                 </div>
+                 </div>
              </div>
          )
         })

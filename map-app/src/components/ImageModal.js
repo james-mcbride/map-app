@@ -6,6 +6,10 @@ function ImageModal({open, modalImage, onClose}) {
     const [imageDescription, setImageDescription] = useState(modalImage?.description ? modalImage?.description : "")
     const [isProfilePicture, setIsProfilePicture] = useState(modalImage?.trip?.trip_profile_image === modalImage?.id)
 
+    const clearState = () => {
+        setImageDescription("")
+        setIsProfilePicture(null)
+    }
     const saveImage = () => {
         axios.put(`http://192.168.86.46:8090/image/${modalImage.id}`, {
             description: imageDescription,
@@ -14,6 +18,7 @@ function ImageModal({open, modalImage, onClose}) {
             console.log("Updated image! response:", res);
         });
         modalImage.description = imageDescription;
+        clearState();
         onClose(modalImage, "update")
     }
 
@@ -22,13 +27,17 @@ function ImageModal({open, modalImage, onClose}) {
             .then(res => {
                 console.log("deleted image! response:", res);
             });
+        clearState();
         onClose(modalImage, "delete")
     }
 
     return (
         <ReactModal isOpen={open} id="view-image-modal">
             <div id="view-image-modal-div">
-                <button id="close-image-modal-button" onClick={onClose}>
+                <button id="close-image-modal-button" onClick={() => {
+                    clearState();
+                    onClose();
+                }}>
                     Close
                 </button>
                 <img src={`data:image/jpeg;base64,${modalImage?.image_location}`}/>

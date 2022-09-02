@@ -81,6 +81,7 @@ function ViewTrip({}) {
                     "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Requested-With",
                 }
             }).then(res => {
+                window.location.replace(`http://192.168.86.46:3000/trip/${res.data.id}`);
                 console.log("Request complete! response:", res);
             });
         }
@@ -93,11 +94,17 @@ function ViewTrip({}) {
         const loadedImages = [...images]
         let index = 0
         reader.onloadend = function () {
-            loadedImages.push(reader.result)
-            setImages(loadedImages)
             axios.post(`http://192.168.86.46:8090/trip/${tripId}/images`, {
-                image: reader.result.split(",")[1]
+                image: reader.result.split(",")[1],
+                imageDescription: `image-${index}`
             })
+                .then(res => {
+                    const image = res.data
+                    console.log(image)
+                    image.image_location = reader.result.replace("data:image/jpeg;base64,", "")
+                    loadedImages.push(image)
+                    setImages(loadedImages)
+                })
             index += 1
             if (index < newFiles.length) {
                 reader.readAsDataURL(newFiles[index])
