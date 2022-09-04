@@ -53,7 +53,7 @@ function ImageModal({open, modalImage, onClose}) {
                 <label>
                     Profile Picture:
                     <input type="checkbox" value={isProfilePicture}
-                           onChange={() => setIsProfilePicture(!isProfilePicture)}/>
+                           onChange={e => setIsProfilePicture(e.target.checked)}/>
                 </label>
                 <button onClick={saveImage}>
                     Save photo

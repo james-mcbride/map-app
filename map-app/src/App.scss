@@ -19,10 +19,17 @@
   top: 10px;
 }
 
+#go-home-button {
+  position: absolute;
+  left: 10px;
+  top: 10px;
+}
+
 #view-trip-header {
   position: relative;
   display: flex;
   justify-content: center;
+  padding: 10px;
 }
 
 #view-trip-images {
@@ -152,6 +159,15 @@
   h4 {
     color: gray;
   }
+}
+
+#trip-list {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.map-container {
+  width: 100%;
 }
 
 

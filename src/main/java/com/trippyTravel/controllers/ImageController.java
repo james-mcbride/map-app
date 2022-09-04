@@ -50,9 +50,13 @@ public class ImageController {
     void updateImage(@PathVariable long id, @RequestBody HashMap<String, Object> data, HttpServletRequest httpServletRequest) {
         Image image= imagesRepository.getOne(id);
         boolean isProfileImage = (boolean) data.get("isProfilePicture");
-        String description = (String) data.get("description");
-        image.setDescription(description);
+        if (data.get("description") != null) {
+            String description = (String) data.get("description");
+            image.setDescription(description);
+        }
+        System.out.println("about to set is profile image");
         if (isProfileImage) {
+            System.out.println("setting is profile image");
             Trip trip = tripRepository.getOne(image.getTrip().getId());
             trip.setTrip_profile_image(Long.toString(image.getId()));
         }
@@ -62,8 +66,10 @@ public class ImageController {
     @CrossOrigin
     @RequestMapping(value="/image/{id}", method= RequestMethod.DELETE, produces="application/json")
     public @ResponseBody
-    void deleteImage(@PathVariable long id) {
+    void deleteImage(@PathVariable long id) throws IOException {
         Image image= imagesRepository.getOne(id);
+        Path destinationFile = Paths.get("/Users/jimmiemcbride/Pictures/mapapp", String.format("%s.jpeg", Long.toString(image.getId())));
+        Files.delete(destinationFile);
         imagesRepository.delete(image);
     }
 
@@ -88,16 +94,12 @@ public class ImageController {
     @RequestMapping(value="/trip/{id}/images", method= RequestMethod.POST, produces="application/json")
     public @ResponseBody
     Image saveImages(@PathVariable long id, @RequestBody HashMap<String, Object> data, HttpServletRequest httpServletRequest) throws IOException {
-        System.out.println("saving image");
         Trip trip= tripRepository.getOne(id);
         Image image = imagesRepository.save(new Image(trip));
-        System.out.println("saved new image");
+        image.setDescription((String) data.get("description"));
         byte[] decodedImage = Base64.decodeBase64((String) data.get("image"));
-        System.out.println("decoded new image");
         Path destinationFIle = Paths.get("/Users/jimmiemcbride/Pictures/mapapp", String.format("%s.jpeg", Long.toString(image.getId())));
-        System.out.println("got destination file");
         Files.write(destinationFIle, decodedImage);
-        System.out.println("writing file");
         return image;
     }
 }

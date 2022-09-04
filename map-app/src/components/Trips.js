@@ -1,12 +1,23 @@
 import React, {useEffect, useState} from 'react'
 import axios from "axios";
+import AllTripsMap from "./AllTripsMap";
 
 function Trips(){
     const [trips, setTrips] = useState([])
+    const [locations, setLocations] = useState([])
+    const [retrievedTrips, setRetrievedTrips] = useState(false)
     useEffect(() => {
-        axios.get('http://192.168.86.46:8090/trip')
-            .then(response => setTrips(response.data))
-    }, [])
+        setRetrievedTrips(true);
+        if (!retrievedTrips) {
+            axios.get('http://192.168.86.46:8090/trip/page/0')
+                .then(response => {
+                    console.log(response.data)
+                    setTrips(response.data.trips)
+                    setLocations(response.data.locations)
+                })
+        }
+    }, []);
+
     const showTrips = () => {
         return trips.map(trip => {
          return (
@@ -24,9 +35,11 @@ function Trips(){
          )
         })
     }
+
     return (
-        <div>
-            <a href="/create"><button className="ui button" type="button" style={{float: "Right", background: "gold"}}>Create Trip</button></a>
+        <div style={{position: "relative"}}>
+            <a href="/create"><button className="ui button" type="button" style={{position: "absolute",right: 10, top: 10, background: "gold", zIndex: 5}}>Create Trip</button></a>
+            <AllTripsMap locations={locations ? locations : []}/>
             <div id="trip-list">
                 {showTrips()}
             </div>

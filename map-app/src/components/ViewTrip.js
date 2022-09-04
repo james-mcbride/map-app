@@ -92,18 +92,20 @@ function ViewTrip({}) {
         console.log(newFiles)
         const reader = new FileReader();
         const loadedImages = [...images]
+        const loadedImagesMap = {}
         let index = 0
         reader.onloadend = function () {
+            loadedImagesMap[`${index}`] = reader.result
             axios.post(`http://192.168.86.46:8090/trip/${tripId}/images`, {
                 image: reader.result.split(",")[1],
-                imageDescription: `image-${index}`
+                description: `${index}`
             })
                 .then(res => {
                     const image = res.data
-                    console.log(image)
-                    image.image_location = reader.result.replace("data:image/jpeg;base64,", "")
+                    image.image_location = loadedImagesMap[image.description]?.replace("data:image/jpeg;base64,", "")
                     loadedImages.push(image)
-                    setImages(loadedImages)
+                    console.log(loadedImages)
+                    setImages([...loadedImages])
                 })
             index += 1
             if (index < newFiles.length) {
@@ -127,17 +129,21 @@ function ViewTrip({}) {
             setImages(updatedImages)
         }
     }
-
     const displayImages = images.filter(image => image.image_location).map(image => {
         return <Image imageFile={image} editImage={editImage}/>
     })
-
+    console.log(displayImages)
     return (
         <div style={{width: "100%"}}>
             <div id="view-trip-header">
                 <h2>{name}</h2>
                 <button id="submit-trip-button" onClick={submitTrip}>
                     {tripId ? "Update Trip!" : "Create trip!"}
+                </button>
+                <button id="go-home-button" onClick={submitTrip}>
+                    <a href="/">
+                        Home
+                    </a>
                 </button>
             </div>
             <div style={{width: "100%"}}>
@@ -168,7 +174,11 @@ function ViewTrip({}) {
                     <div className="trip-info-input">
                         <label htmlFor="startDate">
                             Start Date
-                            <input id="startDate" value={startDate} onChange={e => setStartDate(e.target.value)}
+                            <input id="startDate" value={startDate} onChange={e => {
+                                setStartDate(e.target.value)
+                                setEndDate(e.target.value)
+
+                            }}
                                    type="date"/>
                         </label>
                     </div>

@@ -7,8 +7,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 public class TripController {
@@ -28,25 +30,35 @@ public class TripController {
     }
 
     @CrossOrigin
-    @RequestMapping(value = "/trip", method = RequestMethod.GET, produces = "application/json")
+    @RequestMapping(value = "/trip/page/{page}", method = RequestMethod.GET, produces = "application/json")
     public @ResponseBody
-    List<Trip> retrieveAllTrips() throws IOException {
+    Map<String, Object> retrieveAllTrips(@PathVariable long page) throws IOException {
         List<Trip> trips = tripRepository.findAll();
+        List<String> locations = new ArrayList<>();
+        List<Trip> tripsSubList = new ArrayList<>();
         for (int i = 0; i < trips.size(); i++) {
             Trip trip = trips.get(i);
+            locations.add(trip.getLocation());
             String profileImageId = null;
-            if (trip.getTrip_profile_image() != null) {
-                profileImageId = trip.getTrip_profile_image();
-            } else {
-                if (trip.getImages().size() > 0) {
-                    profileImageId = Long.toString(trip.getImages().get(0).getId());
+            if (i < (page + 10) && i>= (page * 10) ) {
+                if (trip.getTrip_profile_image() != null) {
+                    profileImageId = trip.getTrip_profile_image();
+                } else {
+                    if (trip.getImages().size() > 0) {
+                        profileImageId = Long.toString(trip.getImages().get(0).getId());
+                    }
                 }
-            }
-            if (profileImageId != null) {
-                trip.setTrip_profile_image(imageService.getEncodedImageFileById(profileImageId));
+                if (profileImageId != null) {
+                    trip.setTrip_profile_image(imageService.getEncodedImageFileById(profileImageId));
+                }
+                tripsSubList.add(trip);
             }
         }
-        return trips;
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("locations", locations);
+        map.put("trips", tripsSubList);
+        map.put("numTrips", trips.size());
+        return map;
     }
 
     @CrossOrigin
