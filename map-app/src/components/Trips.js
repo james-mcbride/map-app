@@ -5,18 +5,36 @@ import AllTripsMap from "./AllTripsMap";
 function Trips(){
     const [trips, setTrips] = useState([])
     const [locations, setLocations] = useState([])
-    const [retrievedTrips, setRetrievedTrips] = useState(false)
+    const [numTrips, setNumTrips] = useState(0)
     useEffect(() => {
-        setRetrievedTrips(true);
-        if (!retrievedTrips) {
-            axios.get('http://192.168.86.46:8090/trip/page/0')
+        retrieveTrips(0)
+    }, []);
+
+    function retrieveTrips(index) {
+        if (!numTrips || index * 10 < numTrips) {
+            axios.get(`http://192.168.86.57:8090/trip/page/${index}`)
                 .then(response => {
-                    console.log(response.data)
-                    setTrips(response.data.trips)
-                    setLocations(response.data.locations)
+                    if (index === 0) {
+                        setNumTrips(num => num + response.data.numTrips)
+                    }
+                    // console.log(trips);
+                    // console.log(response.data.trips);
+                    // const updatedTrips = trips.concat(response.data.trips)
+                    // console.log(updatedTrips)
+                    setTrips(trips => trips.concat(response.data.trips));
+                    setLocations(locations => locations.concat(response.data.locations));
+                    const numberOfTrips = numTrips ? numTrips : response.data.numTrips
+                    console.log(index, numberOfTrips)
+                    if ((10 + index * 10) < numberOfTrips) {
+                        retrieveTrips(index+=1)
+                    }
                 })
         }
-    }, []);
+    }
+
+    const filterTripsForMarkerEvent = tripLocation => {
+
+    }
 
     const showTrips = () => {
         return trips.map(trip => {
@@ -39,7 +57,7 @@ function Trips(){
     return (
         <div style={{position: "relative"}}>
             <a href="/create"><button className="ui button" type="button" style={{position: "absolute",right: 10, top: 10, background: "gold", zIndex: 5}}>Create Trip</button></a>
-            <AllTripsMap locations={locations ? locations : []}/>
+            <AllTripsMap locations={locations ? locations : []} onMarkerEvent={filterTripsForMarkerEvent}/>
             <div id="trip-list">
                 {showTrips()}
             </div>

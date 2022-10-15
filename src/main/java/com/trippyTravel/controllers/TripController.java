@@ -33,14 +33,15 @@ public class TripController {
     @RequestMapping(value = "/trip/page/{page}", method = RequestMethod.GET, produces = "application/json")
     public @ResponseBody
     Map<String, Object> retrieveAllTrips(@PathVariable long page) throws IOException {
-        List<Trip> trips = tripRepository.findAll();
+        List<Trip> trips = tripRepository.findTripsWithPageLimit(page * 10);
+        long count = tripRepository.getNumTrips();
         List<String> locations = new ArrayList<>();
         List<Trip> tripsSubList = new ArrayList<>();
         for (int i = 0; i < trips.size(); i++) {
             Trip trip = trips.get(i);
             locations.add(trip.getLocation());
             String profileImageId = null;
-            if (i < (page + 10) && i>= (page * 10) ) {
+//            if (i < (page + 10) && i>= (page * 10) ) {
                 if (trip.getTrip_profile_image() != null) {
                     profileImageId = trip.getTrip_profile_image();
                 } else {
@@ -52,12 +53,12 @@ public class TripController {
                     trip.setTrip_profile_image(imageService.getEncodedImageFileById(profileImageId));
                 }
                 tripsSubList.add(trip);
-            }
+//            }
         }
         HashMap<String, Object> map = new HashMap<>();
         map.put("locations", locations);
         map.put("trips", tripsSubList);
-        map.put("numTrips", trips.size());
+        map.put("numTrips", count);
         return map;
     }
 

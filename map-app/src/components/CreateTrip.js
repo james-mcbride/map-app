@@ -12,7 +12,7 @@ function CreateTrip() {
 
 
     const submitTrip = () => {
-        axios.post("http://192.168.86.46:8090/trip/create", {
+        axios.post("http://192.168.86.57:8090/trip/create", {
                 name: name,
                 location: location,
                 startDate: startDate,
@@ -26,7 +26,7 @@ function CreateTrip() {
             }
         }).then(res => {
             console.log("Request complete! response:", res);
-            window.location.replace(`http://192.168.86.46:3000/trip/${res.data.id}`);
+            window.location.replace(`http://192.168.86.57:3000/trip/${res.data.id}`);
         });
     }
 

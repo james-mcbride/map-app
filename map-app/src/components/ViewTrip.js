@@ -17,14 +17,14 @@ function ViewTrip({}) {
 
     useEffect(() => {
         if (tripId) {
-            axios.get(`http://192.168.86.46:8090/trip/${tripId}`)
+            axios.get(`http://192.168.86.57:8090/trip/${tripId}`)
                 .then(response => {
                     setLocation(response.data.location)
                     setName(response.data.name)
                     setStartDate(response.data.startDate.split(" ")[0])
                     setEndDate(response.data.endDate.split(" ")[0])
                 })
-            axios.get(`http://192.168.86.46:8090/trip/${tripId}/images`)
+            axios.get(`http://192.168.86.57:8090/trip/${tripId}/images`)
                 .then(response => {
                     if (response.data.length <= 5) {
                         setImages(response.data);
@@ -37,10 +37,10 @@ function ViewTrip({}) {
 
     function retrieveImage(imageList, index) {
         if (index < imageList.length) {
-            axios.get(`http://192.168.86.46:8090/image/${imageList[index].id}`)
+            axios.get(`http://192.168.86.57:8090/image/${imageList[index].id}`)
                 .then(response => {
                     imageList[index].image_location = response.data.image_location
-                    setImages(imageList)
+                    setImages([...imageList])
                     retrieveImage(imageList, index + 1)
                 })
         }
@@ -54,7 +54,7 @@ function ViewTrip({}) {
 
     const submitTrip = () => {
         if (tripId) {
-            axios.put("http://192.168.86.46:8090/trip/create", {
+            axios.put("http://192.168.86.57:8090/trip/create", {
                 name: name,
                 location: location,
                 startDate: startDate,
@@ -69,7 +69,7 @@ function ViewTrip({}) {
                 console.log("Request complete! response:", res);
             });
         } else {
-            axios.post("http://192.168.86.46:8090/trip/create", {
+            axios.post("http://192.168.86.57:8090/trip/create", {
                 name: name,
                 location: location,
                 startDate: startDate,
@@ -81,7 +81,7 @@ function ViewTrip({}) {
                     "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Requested-With",
                 }
             }).then(res => {
-                window.location.replace(`http://192.168.86.46:3000/trip/${res.data.id}`);
+                window.location.replace(`http://192.168.86.57:3000/trip/${res.data.id}`);
                 console.log("Request complete! response:", res);
             });
         }
@@ -89,14 +89,13 @@ function ViewTrip({}) {
 
     const addImages = e => {
         const newFiles = Object.values(e.target.files)
-        console.log(newFiles)
         const reader = new FileReader();
         const loadedImages = [...images]
         const loadedImagesMap = {}
         let index = 0
         reader.onloadend = function () {
             loadedImagesMap[`${index}`] = reader.result
-            axios.post(`http://192.168.86.46:8090/trip/${tripId}/images`, {
+            axios.post(`http://192.168.86.57:8090/trip/${tripId}/images`, {
                 image: reader.result.split(",")[1],
                 description: `${index}`
             })
@@ -104,7 +103,6 @@ function ViewTrip({}) {
                     const image = res.data
                     image.image_location = loadedImagesMap[image.description]?.replace("data:image/jpeg;base64,", "")
                     loadedImages.push(image)
-                    console.log(loadedImages)
                     setImages([...loadedImages])
                 })
             index += 1
@@ -129,10 +127,14 @@ function ViewTrip({}) {
             setImages(updatedImages)
         }
     }
-    const displayImages = images.filter(image => image.image_location).map(image => {
-        return <Image imageFile={image} editImage={editImage}/>
-    })
-    console.log(displayImages)
+    const displayImages = imageList => {
+        return imageList.filter(image => {
+            return image.image_location
+        }).map(image => {
+            return <Image imageFile={image} editImage={editImage}/>
+        })
+    }
+
     return (
         <div style={{width: "100%"}}>
             <div id="view-trip-header">
@@ -198,7 +200,7 @@ function ViewTrip({}) {
                 </div>
             </div>
             {tripId && (<div id="view-trip-images">
-                {displayImages}
+                {displayImages(images)}
             </div>)}
             <ImageModal modalImage={modalImage} open={open} onClose={closeImageModal} />
         </div>

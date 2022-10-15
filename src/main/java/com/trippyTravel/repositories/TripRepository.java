@@ -16,7 +16,13 @@ public interface TripRepository extends JpaRepository<Trip,Long> {
     List<Trip> findByDescriptionContainingOrNameContainingOrLocationContaining(String term, String term1, String term2);
     List<Trip> findAllByDescriptionContainingOrNameContainingOrLocationContaining(String term, String term1, String term2);
 
+    @Query(nativeQuery = true, value="SELECT * from trips LIMIT 10 offset :offset")
+    List<Trip> findTripsWithPageLimit(@Param("offset") long offset);
+
     List<Trip> findAllByOrderByIdDesc();
+
+    @Query(nativeQuery = true, value="SELECT COUNT(*) from trips")
+    long getNumTrips();
 
 }
 
