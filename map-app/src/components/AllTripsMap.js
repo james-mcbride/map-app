@@ -1,7 +1,7 @@
 import React, {useRef, useEffect, useState} from 'react';
 import mapboxgl from '!mapbox-gl'; // eslint-disable-line import/no-webpack-loader-syntax
 
-function AllTripsMap({locations}) {
+function AllTripsMap({locations, onMarkerEvent}) {
     const accessToken = 'pk.eyJ1IjoiamFtZXMtbWNicmlkZSIsImEiOiJja2lqMHhudGEwdmtyMnJsY2VodHpkdmE1In0.q2A-peliF2vmbST01Es9TA';
     mapboxgl.accessToken = accessToken;
     const mapContainer = useRef(null);
@@ -9,37 +9,31 @@ function AllTripsMap({locations}) {
     const [lng, setLng] = useState(-89.9);
     const [lat, setLat] = useState(35);
     const [zoom, setZoom] = useState(2);
-    console.log(locations);
     useEffect(() => {
         if (locations) {
+            const markerList = []
             locations.forEach(location => {
             fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${location}.json?access_token=${accessToken}`)
                 .then(response => response.json())
                 .then(data => {
                     if (data.features) {
-                        // setLng(data.features[0].center[0])
-                        // setLat(data.features[0].center[1])
                         const marker = new mapboxgl.Marker()
                             .setLngLat({
                                 lng: data.features[0].center[0],
                                 lat: data.features[0].center[1]
                             })
                             .addTo(map.current);
-                        const markerDiv = marker.getElement();
-                        markerDiv.addEventListener('mouseenter', () => console.log("hovered over location: " + location))
-                        markerDiv.addEventListener('mouseleave', () => console.log("ended hover over location: " + location))
-                        markerDiv.addEventListener('click', () => {
-                            console.log("clicked on location: " + location)
-                        })
-
+                        addListenersToMarker(marker, location)
                     }
                 })
             })
         }
     }, [locations])
 
-
-    // const marker = new mapboxgl.Marker().setLngLat().addTo(map)
+    function addListenersToMarker(marker, location) {
+        const markerDiv = marker.getElement();
+        markerDiv.addEventListener('click', () => onMarkerEvent( location))
+    }
 
     useEffect(() => {
         if (map.current) return;

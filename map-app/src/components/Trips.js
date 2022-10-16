@@ -6,6 +6,8 @@ function Trips(){
     const [trips, setTrips] = useState([])
     const [locations, setLocations] = useState([])
     const [numTrips, setNumTrips] = useState(0)
+    const [locationsClickedStatus, setLocationsClickedStatus] = useState({})
+
     useEffect(() => {
         retrieveTrips(0)
     }, []);
@@ -23,6 +25,13 @@ function Trips(){
                     // console.log(updatedTrips)
                     setTrips(trips => trips.concat(response.data.trips));
                     setLocations(locations => locations.concat(response.data.locations));
+                    setLocationsClickedStatus(obj => {
+                        const updatedObj = {...obj}
+                        response.data.locations.forEach(location => {
+                            updatedObj[location] = false
+                        })
+                        return updatedObj
+                    })
                     const numberOfTrips = numTrips ? numTrips : response.data.numTrips
                     console.log(index, numberOfTrips)
                     if ((10 + index * 10) < numberOfTrips) {
@@ -32,12 +41,31 @@ function Trips(){
         }
     }
 
-    const filterTripsForMarkerEvent = tripLocation => {
+    const filterTripsForMarkerEvent = (tripLocation) => {
+        setLocationsClickedStatus(obj => {
+            const updatedTripLocationsObj = { ...obj }
+            Object.keys(updatedTripLocationsObj).forEach(location => {
+                if (tripLocation !== location)
+                    updatedTripLocationsObj[location] = false
+            })
+            updatedTripLocationsObj[tripLocation] = !updatedTripLocationsObj[tripLocation]
+            return updatedTripLocationsObj
+        })
+    }
 
+    const markerSelected = () => {
+        let numSelected = 0;
+        Object.keys(locationsClickedStatus).forEach(location=> {
+            if (locationsClickedStatus[location]) {
+                numSelected++
+            }
+        })
+        return numSelected > 0
     }
 
     const showTrips = () => {
-        return trips.map(trip => {
+        const markerCurrentlySelected = markerSelected();
+        return trips.filter(trip => !markerCurrentlySelected || (locationsClickedStatus[trip.location]  && markerCurrentlySelected)).map(trip => {
          return (
              <div className="trip-tile">
                  <div className="trip-tile-main">
