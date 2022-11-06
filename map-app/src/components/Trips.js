@@ -65,7 +65,12 @@ function Trips(){
 
     const showTrips = () => {
         const markerCurrentlySelected = markerSelected();
-        return trips.filter(trip => !markerCurrentlySelected || (locationsClickedStatus[trip.location]  && markerCurrentlySelected)).map(trip => {
+        return trips.filter(trip => !markerCurrentlySelected || (locationsClickedStatus[trip.location]  && markerCurrentlySelected)).sort(function(a,b){
+            // Turn your strings into dates, and then subtract them
+            // to get a value that is either negative, positive, or zero.
+            console.log(b.startDate)
+            return new Date(b.startDate) - new Date(a.startDate);
+        }).map(trip => {
          return (
              <div className="trip-tile">
                  <div className="trip-tile-main">
@@ -85,7 +90,7 @@ function Trips(){
     return (
         <div style={{position: "relative"}}>
             <a href="/create"><button className="ui button" type="button" style={{position: "absolute",right: 10, top: 10, background: "gold", zIndex: 5}}>Create Trip</button></a>
-            <AllTripsMap locations={locations ? locations : []} onMarkerEvent={filterTripsForMarkerEvent}/>
+            <AllTripsMap locations={locations ? locations : []} onMarkerEvent={filterTripsForMarkerEvent} locationsClickedStatus={locationsClickedStatus}/>
             <div id="trip-list">
                 {showTrips()}
             </div>

@@ -8,8 +8,17 @@ function CreateTrip() {
     const [name, setName] = useState('');
     const [location, setLocation] = useState('')
     const [startDate, setStartDate] = useState('');
-    const [endDate, setEndDate] = useState('')
+    const [endDate, setEndDate] = useState('');
+    const [tripType, setTripType] = useState(null);
+    const [parentTripName, setParentTripName] = useState('')
+    const [parentTrips, setParentTrips] = useState([])
 
+    useEffect(() => {
+        axios.get(`http://192.168.86.57:8090/parentTrip`)
+            .then(response => {
+                setParentTrips(response.data)
+            })
+    }, [])
 
     const submitTrip = () => {
         axios.post("http://192.168.86.57:8090/trip/create", {
@@ -29,6 +38,10 @@ function CreateTrip() {
             window.location.replace(`http://192.168.86.57:3000/trip/${res.data.id}`);
         });
     }
+
+    const displayParentTripOptions = parentTrips.map(tripName => {
+        return <option value={tripName}>{tripName}</option>
+    })
 
     return (
         <div className="createTrip">
@@ -52,6 +65,26 @@ function CreateTrip() {
                     End Date
                     <input id="endDate" value={endDate} onChange={e => setEndDate(e.target.value)} type="date"/>
                 </label>
+                <div className="tripTypeDiv">
+                    <label htlmFor="parentTripCheckbox">
+                        Trip type
+                        <select id="parentTripSelect" value={tripType} onChange={e => setTripType(e.target.value)}>
+                            <option value="">Single Location Trip</option>
+                            <option value="parentTrip">Parent Trip</option>
+                            <option value="childTrip">Child Trip</option>
+                        </select>
+                    </label>
+                    {tripType === 'parentTrip' && (<label htmlFor="parentTripInput">
+                        Parent Trip Name
+                        <input  id='parentTripInput' value={parentTripName} onChange={e => setParentTripName(e.target.value)} />
+                    </label>)}
+                    {tripType === 'childTrip' && (<label htmlFor="parentTripNameDropdown">
+                        Parent Trip Name
+                        <select id="parentTripNameDropdown" value={parentTripName} onChange={e => setParentTripName(e.target.value)}>
+                            {displayParentTripOptions}
+                        </select>
+                    </label>)}
+                </div>
                 <br/>
                 <button onClick={submitTrip}>
                     Create trip!

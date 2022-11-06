@@ -41,19 +41,17 @@ public class TripController {
             Trip trip = trips.get(i);
             locations.add(trip.getLocation());
             String profileImageId = null;
-//            if (i < (page + 10) && i>= (page * 10) ) {
-                if (trip.getTrip_profile_image() != null) {
-                    profileImageId = trip.getTrip_profile_image();
-                } else {
-                    if (trip.getImages().size() > 0) {
-                        profileImageId = Long.toString(trip.getImages().get(0).getId());
-                    }
+            if (trip.getTrip_profile_image() != null) {
+                profileImageId = trip.getTrip_profile_image();
+            } else {
+                if (trip.getImages().size() > 0) {
+                    profileImageId = Long.toString(trip.getImages().get(0).getId());
                 }
-                if (profileImageId != null) {
-                    trip.setTrip_profile_image(imageService.getEncodedImageFileById(profileImageId));
-                }
-                tripsSubList.add(trip);
-//            }
+            }
+            if (profileImageId != null) {
+                trip.setTrip_profile_image(imageService.getEncodedImageFileById(profileImageId));
+            }
+            tripsSubList.add(trip);
         }
         HashMap<String, Object> map = new HashMap<>();
         map.put("locations", locations);
@@ -71,20 +69,28 @@ public class TripController {
     @CrossOrigin
     @RequestMapping(value="/trip/create", method=RequestMethod.POST, produces="application/json")
     public @ResponseBody Trip createTrip(@RequestBody HashMap<String, Object> data, HttpServletRequest httpServletRequest){
-        Trip trip = new Trip((String) data.get("location"), (String) data.get("name"), (String) data.get("startDate"), (String) data.get("endDate"));
+        Trip trip = new Trip((String) data.get("location"), (String) data.get("name"), (String) data.get("startDate"),
+                (String) data.get("endDate"), (String) data.get("tripType"), (String) data.get("parentTrip"));
         return tripRepository.save(trip);
     }
 
     @CrossOrigin
     @RequestMapping(value="/trip/{id}", method=RequestMethod.PUT, produces="application/json")
     public @ResponseBody Trip updateTrip(@PathVariable long id, @RequestBody HashMap<String, Object> data, HttpServletRequest httpServletRequest){
-        Trip trip = new Trip((String) data.get("location"), (String) data.get("name"), (String) data.get("startDate"), (String) data.get("endDate"));
         Trip tripFromDb = tripRepository.getOne(id);
-        tripFromDb.setName(trip.getName());
-        tripFromDb.setLocation(trip.getLocation());
-        tripFromDb.setStartDate(trip.getStartDate());
-        tripFromDb.setEndDate(trip.getEndDate());
+        tripFromDb.setName((String) data.get("name"));
+        tripFromDb.setLocation((String) data.get("location"));
+        tripFromDb.setStartDate((String) data.get("startDate"));
+        tripFromDb.setEndDate((String) data.get("endDate"));
+        tripFromDb.setTripType((String) data.get("tripType"));
+        tripFromDb.setParentTrip((String) data.get("parentTrip"));
         return tripRepository.save(tripFromDb);
+    }
+
+    @CrossOrigin
+    @RequestMapping(value="/parentTrips", method=RequestMethod.GET, produces="application/json")
+    public @ResponseBody List<String> retrieveParentTrips() {
+        return tripRepository.findAllParentTrips();
     }
 
 }

@@ -14,6 +14,9 @@ function ViewTrip({}) {
     const [images, setImages] = useState([])
     const [modalImage, setModalImage] = useState(null)
     const [open, setOpen] = useState(false)
+    const [tripType, setTripType] = useState(null);
+    const [parentTripName, setParentTripName] = useState('')
+    const [parentTrips, setParentTrips] = useState([])
 
     useEffect(() => {
         if (tripId) {
@@ -23,6 +26,8 @@ function ViewTrip({}) {
                     setName(response.data.name)
                     setStartDate(response.data.startDate.split(" ")[0])
                     setEndDate(response.data.endDate.split(" ")[0])
+                    setTripType(response.data.tripType)
+                    setParentTripName(response.data.parentTrip)
                 })
             axios.get(`http://192.168.86.57:8090/trip/${tripId}/images`)
                 .then(response => {
@@ -31,6 +36,10 @@ function ViewTrip({}) {
                     } else {
                         retrieveImage(response.data, 0)
                     }
+                })
+            axios.get(`http://192.168.86.57:8090/parentTrips`)
+                .then(response => {
+                    setParentTrips(response.data)
                 })
         }
     }, [])
@@ -54,11 +63,13 @@ function ViewTrip({}) {
 
     const submitTrip = () => {
         if (tripId) {
-            axios.put("http://192.168.86.57:8090/trip/create", {
+            axios.put(`http://192.168.86.57:8090/trip/${tripId}`, {
                 name: name,
                 location: location,
                 startDate: startDate,
-                endDate: endDate
+                endDate: endDate,
+                tripType: tripType,
+                parentTrip: parentTripName
             }, {
                 headers: {
                     "Access-Control-Allow-Origin": "*",
@@ -73,7 +84,9 @@ function ViewTrip({}) {
                 name: name,
                 location: location,
                 startDate: startDate,
-                endDate: endDate
+                endDate: endDate,
+                tripType: tripType,
+                parentTrip: parentTripName
             }, {
                 headers: {
                     "Access-Control-Allow-Origin": "*",
@@ -134,6 +147,10 @@ function ViewTrip({}) {
             return <Image imageFile={image} editImage={editImage}/>
         })
     }
+
+    const displayParentTripOptions = parentTrips.map(tripName => {
+        return <option value={tripName}>{tripName}</option>
+    })
 
     return (
         <div style={{width: "100%"}}>
@@ -197,6 +214,26 @@ function ViewTrip({}) {
                         onChange={addImages}
                         multiple
                     />)}
+                    <div className="tripTypeDiv">
+                        <label htlmFor="parentTripCheckbox">
+                            Trip type
+                            <select id="parentTripSelect" value={tripType} onChange={e => setTripType(e.target.value)}>
+                                <option value="">Single Location Trip</option>
+                                <option value="parentTrip">Parent Trip</option>
+                                <option value="childTrip">Child Trip</option>
+                            </select>
+                        </label>
+                        {tripType === 'parentTrip' && (<label htmlFor="parentTripInput">
+                            Parent Trip Name
+                            <input  id='parentTripInput' value={parentTripName} onChange={e => setParentTripName(e.target.value)} />
+                        </label>)}
+                        {tripType === 'childTrip' && (<label htmlFor="parentTripNameDropdown">
+                            Parent Trip Name
+                            <select id="parentTripNameDropdown" value={parentTripName} onChange={e => setParentTripName(e.target.value)}>
+                                {displayParentTripOptions}
+                            </select>
+                        </label>)}
+                    </div>
                 </div>
             </div>
             {tripId && (<div id="view-trip-images">

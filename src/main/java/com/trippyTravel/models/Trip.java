@@ -52,20 +52,28 @@ public class Trip {
     @JsonBackReference
     private List<Location> locations;
 
+    @Column(name = "trip_type")
+    private String tripType;
+
+    @Column(name = "parent_trip")
+    private String parentTrip;
+
     public Trip() {
     }
 
     public Trip(Long id) {
         this.id = id;
     }
-    public Trip(String location, String name, String startDate, String endDate) {
+    public Trip(String location, String name, String startDate, String endDate, String tripType, String parentTrip) {
         this.location = location;
         this.name = name;
         this.startDate = startDate;
         this.endDate = endDate;
+        this.tripType = tripType;
+        this.parentTrip = parentTrip;
     }
 
-    public Trip(String location, String name, String description, String trip_profile_image, String startDate, String endDate, List<User> users, List<Image> images) {
+    public Trip(String location, String name, String description, String trip_profile_image, String startDate, String endDate, List<User> users, List<Image> images, String tripType, String parentTrip) {
         this.location = location;
         this.name = name;
         this.description = description;
@@ -74,6 +82,8 @@ public class Trip {
         this.endDate = endDate;
         this.users = users;
         this.images = images;
+        this.tripType = tripType;
+        this.parentTrip = parentTrip;
     }
 
     public long getId() { return id; }
@@ -113,4 +123,19 @@ public class Trip {
         this.images = images;
     }
 
+    public String getTripType() {
+        return tripType;
+    }
+
+    public void setTripType(String tripType) {
+        this.tripType = tripType;
+    }
+
+    public String getParentTrip() {
+        return parentTrip;
+    }
+
+    public void setParentTrip(String parentTrip) {
+        this.parentTrip = parentTrip;
+    }
 }
