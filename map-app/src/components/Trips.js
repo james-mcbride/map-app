@@ -1,12 +1,16 @@
 import React, {useEffect, useState} from 'react'
 import axios from "axios";
 import AllTripsMap from "./AllTripsMap";
+import ViewTrip from "./ViewTrip";
 
 function Trips(){
     const [trips, setTrips] = useState([])
     const [locations, setLocations] = useState([])
     const [numTrips, setNumTrips] = useState(0)
     const [locationsClickedStatus, setLocationsClickedStatus] = useState({})
+    const [openViewTripModal, setOpenViewTripModal] = useState(false)
+    const [viewTripId, setViewTripId] = useState(null)
+    const [filterTrips, setFilterTrips] = useState(false)
 
     useEffect(() => {
         retrieveTrips(0)
@@ -14,7 +18,7 @@ function Trips(){
 
     function retrieveTrips(index) {
         if (!numTrips || index * 10 < numTrips) {
-            axios.get(`http://192.168.86.57:8090/trip/page/${index}`)
+            axios.get(`http://192.168.86.50:8090/trip/page/${index}`)
                 .then(response => {
                     if (index === 0) {
                         setNumTrips(num => num + response.data.numTrips)
@@ -63,7 +67,7 @@ function Trips(){
         return numSelected > 0
     }
 
-    const showTrips = () => {
+    const showFilteredTrips = () => {
         const markerCurrentlySelected = markerSelected();
         return trips.filter(trip => !markerCurrentlySelected || (locationsClickedStatus[trip.location]  && markerCurrentlySelected)).sort(function(a,b){
             // Turn your strings into dates, and then subtract them
@@ -79,7 +83,10 @@ function Trips(){
                      <h2>{trip.name}</h2>
                      <h4>{trip.location}</h4>
                      <h5>{`${trip.startDate.split(" ")[0]} - ${trip.endDate.split(" ")[0]}`}</h5>
-                     <a href={`/trip/${trip.id}`}><button>Edit Trip</button></a>
+                     <button onClick={() => {
+                         setViewTripId(trip.id)
+                         setOpenViewTripModal(true)
+                     }}>Edit Trip</button>
                  </div>
                  </div>
              </div>
@@ -87,13 +94,40 @@ function Trips(){
         })
     }
 
+    const showTrips = () => {
+        const markerCurrentlySelected = markerSelected();
+        return trips.filter(trip => !markerCurrentlySelected || (locationsClickedStatus[trip.location]  && markerCurrentlySelected)).map(trip => {
+            return (
+                <div className="trip-tile">
+                    <div className="trip-tile-main">
+                        <div className="trip-profile-image"><img src={`data:image/jpeg;base64,${trip?.trip_profile_image}`}/></div>
+                        <div>
+                            <h2>{trip.name}</h2>
+                            <h4>{trip.location}</h4>
+                            <h5>{`${trip.startDate.split(" ")[0]} - ${trip.endDate.split(" ")[0]}`}</h5>
+                            <button onClick={() => {
+                                setViewTripId(trip.id)
+                                setOpenViewTripModal(true)
+                            }}>Edit Trip</button>
+                        </div>
+                    </div>
+                </div>
+            )
+        })
+    }
+
     return (
         <div style={{position: "relative"}}>
             <a href="/create"><button className="ui button" type="button" style={{position: "absolute",right: 10, top: 10, background: "gold", zIndex: 5}}>Create Trip</button></a>
             <AllTripsMap locations={locations ? locations : []} onMarkerEvent={filterTripsForMarkerEvent} locationsClickedStatus={locationsClickedStatus}/>
-            <div id="trip-list">
-                {showTrips()}
+            <div id="trip-list" style={{position: "relative"}}>
+                <button onClick={() => setFilterTrips(true)} id="filter-trips-button">Sort By Date</button>
+                {filterTrips ? showFilteredTrips() : showTrips()}
             </div>
+            <ViewTrip open={openViewTripModal} tripId={viewTripId} onClose={() => {
+                setOpenViewTripModal(false)
+                setViewTripId(null)
+            }}/>
         </div>
     )
 }
