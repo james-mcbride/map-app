@@ -14,14 +14,14 @@ function CreateTrip() {
     const [parentTrips, setParentTrips] = useState([])
 
     useEffect(() => {
-        axios.get(`http://192.168.86.50:8090/parentTrip`)
+        axios.get(`http://192.168.86.83:8090/parentTrip`)
             .then(response => {
                 setParentTrips(response.data)
             })
     }, [])
 
     const submitTrip = () => {
-        axios.post("http://192.168.86.50:8090/trip/create", {
+        axios.post("http://192.168.86.83:8090/trip/create", {
                 name: name,
                 location: location,
                 startDate: startDate,
@@ -35,7 +35,7 @@ function CreateTrip() {
             }
         }).then(res => {
             console.log("Request complete! response:", res);
-            window.location.replace(`http://192.168.86.50:3000/trip/${res.data.id}`);
+            window.location.replace(`http://192.168.86.83:3000/trip/${res.data.id}`);
         });
     }
 

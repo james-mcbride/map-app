@@ -48,7 +48,7 @@
   }
 
   .view-trip-image {
-    width: 49vw;
+    width: 45vw;
     height: 49vw;
     object-fit: cover;
   }
@@ -77,7 +77,7 @@
   }
 
   .view-trip-image {
-    width: 32vw;
+    width: 30vw;
     height: 32vw;
     object-fit: cover;
   }
@@ -128,14 +128,17 @@
   z-index: 3;
 }
 
-#image-modal-input {
+#image-modal-input, #image-modal-activity {
   margin-top: 20px;
   input {
-    margin-left: 10px;
     width: 300px;
   }
   display: flex;
   justify-content: center;
+  label, button, input {
+    margin-left: 10px;
+  }
+
 }
 
 #save-image-div {
