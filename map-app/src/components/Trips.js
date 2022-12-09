@@ -135,6 +135,8 @@ function Trips(){
                 if (newTrip) {
                     setTrips([...trips, newTrip])
                     setLocations([...locations, newTrip.location])
+                    setViewTripId(newTrip.id)
+                    setOpenViewTripModal(true)
                 }
             }}/>
         </div>

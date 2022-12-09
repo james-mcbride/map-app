@@ -35,6 +35,13 @@ function CreateTrip({open, onClose}) {
                 "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Requested-With"
             }
         }).then(response => {
+            setName('');
+            setLocation('')
+            setStartDate('');
+            setEndDate('');
+            setTripType(null);
+            setParentTripName('')
+            setParentTrips([])
             onClose(response.data)
         });
     }
@@ -46,7 +53,7 @@ function CreateTrip({open, onClose}) {
     return (
         <ReactModal isOpen={open}>
             <div className="createTrip">
-                <button id="go-home-button" onClick={onClose}>
+                <button id="go-home-button" onClick={() => onClose()}>
                     Close
                 </button>
                 <div id="create-trip-info">
