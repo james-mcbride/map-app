@@ -18,6 +18,10 @@ public class Trip {
     @JsonBackReference
     private List<Image> images;
 
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "trip")
+    @JsonBackReference
+    private List<Activity> activities;
+
     @Column(nullable = false, length = 250)
     private String location;
 
@@ -137,5 +141,13 @@ public class Trip {
 
     public void setParentTrip(String parentTrip) {
         this.parentTrip = parentTrip;
+    }
+
+    public List<Activity> getActivities() {
+        return activities;
+    }
+
+    public void setActivities(List<Activity> activities) {
+        this.activities = activities;
     }
 }

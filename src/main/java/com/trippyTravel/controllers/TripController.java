@@ -63,7 +63,9 @@ public class TripController {
     @CrossOrigin
     @RequestMapping(value="/trip/{id}", method=RequestMethod.GET, produces="application/json")
     public @ResponseBody Trip retrieveTripById(@PathVariable long id) {
-        return tripRepository.getOne(id);
+        Trip trip = tripRepository.getOne(id);
+        System.out.println("num trip activities: " + trip.getActivities().size());
+        return trip;
     }
 
     @CrossOrigin

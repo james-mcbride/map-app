@@ -2,6 +2,7 @@ import React, {useEffect, useState} from 'react'
 import axios from "axios";
 import AllTripsMap from "./AllTripsMap";
 import ViewTrip from "./ViewTrip";
+import CreateTrip from "./CreateTrip";
 
 function Trips(){
     const [trips, setTrips] = useState([])
@@ -11,6 +12,7 @@ function Trips(){
     const [openViewTripModal, setOpenViewTripModal] = useState(false)
     const [viewTripId, setViewTripId] = useState(null)
     const [filterTrips, setFilterTrips] = useState(false)
+    const [openCreateTripModal, setOpenCreateTripModal] = useState(false)
 
     useEffect(() => {
         retrieveTrips(0)
@@ -18,7 +20,7 @@ function Trips(){
 
     function retrieveTrips(index) {
         if (!numTrips || index * 10 < numTrips) {
-            axios.get(`http://192.168.86.83:8090/trip/page/${index}`)
+            axios.get(`http://localhost:8090/trip/page/${index}`)
                 .then(response => {
                     if (index === 0) {
                         setNumTrips(num => num + response.data.numTrips)
@@ -118,8 +120,8 @@ function Trips(){
 
     return (
         <div style={{position: "relative"}}>
-            <a href="/create"><button className="ui button" type="button" style={{position: "absolute",right: 10, top: 10, background: "gold", zIndex: 5}}>Create Trip</button></a>
-            <AllTripsMap locations={locations ? locations : []} onMarkerEvent={filterTripsForMarkerEvent} locationsClickedStatus={locationsClickedStatus}/>
+            <button className="ui button" type="button" onClick={() => setOpenCreateTripModal(true)} style={{position: "absolute",right: 10, top: 10, background: "gold", zIndex: 5}}>Create Trip</button>
+            <AllTripsMap initialZoomLevel={2} locations={locations ? locations : []} onMarkerEvent={filterTripsForMarkerEvent} locationsClickedStatus={locationsClickedStatus}/>
             <div id="trip-list" style={{position: "relative"}}>
                 <button onClick={() => setFilterTrips(true)} id="filter-trips-button">Sort By Date</button>
                 {filterTrips ? showFilteredTrips() : showTrips()}
@@ -127,6 +129,13 @@ function Trips(){
             <ViewTrip open={openViewTripModal} tripId={viewTripId} onClose={() => {
                 setOpenViewTripModal(false)
                 setViewTripId(null)
+            }}/>
+            <CreateTrip open={openCreateTripModal} onClose={newTrip => {
+                setOpenCreateTripModal(false)
+                if (newTrip) {
+                    setTrips([...trips, newTrip])
+                    setLocations([...locations, newTrip.location])
+                }
             }}/>
         </div>
     )

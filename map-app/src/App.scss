@@ -1,16 +1,28 @@
 #tripInfo {
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
 
-  input {
+  input, select {
     margin: 10px;
   }
 
-  margin-bottom: 25px;
+  margin: 10px 10px 25px;
 }
 
 .createTrip {
   display: flex;
+  label {
+    //margin: 5px 15px;
+  }
+  text-align: center;
+}
+
+#create-trip-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 #submit-trip-button {
@@ -177,6 +189,21 @@
   position: absolute;
   left: 5px;
   top: 5px;
+}
+
+#add-activities-popup {
+  position: fixed;
+  left: 25vw;
+  height: 50px;
+  padding: 25px;
+  width: 50vw;
+  background: lightgray;
+  z-index: 1000;
+  opacity: 0.9;
+  text-align: center;
+  button {
+    margin-top: 10px;
+  }
 }
 
 

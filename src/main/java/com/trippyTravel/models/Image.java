@@ -27,6 +27,11 @@ public class Image {
     @JsonManagedReference
     private Trip trip;
 
+    @ManyToOne
+    @JoinColumn(name = "activity_id")
+    @JsonManagedReference
+    private Activity activity;
+
     @Column( name= "image_location", columnDefinition = "text")
     private String image_location;
 
@@ -86,5 +91,13 @@ public Image(Trip trip) {
 
     public void setTrip(Trip trip) {
         this.trip = trip;
+    }
+
+    public Activity getActivity() {
+        return activity;
+    }
+
+    public void setActivity(Activity activity) {
+        this.activity = activity;
     }
 }

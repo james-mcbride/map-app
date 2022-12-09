@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react";
 
 
-function Image({imageFile, editImage}) {
+function Image({imageFile, editImage, imageIdsForNewActivity}) {
     const [imageUrl, setImageUrl] = useState("")
 
     useEffect(() => {
@@ -12,7 +12,7 @@ function Image({imageFile, editImage}) {
 
     return (
         <div className="view-trip-image-div" onClick={() => editImage(imageFile)}>
-            <img src={imageUrl} className="view-trip-image"/>
+            <img src={imageUrl} className="view-trip-image" style={imageIdsForNewActivity.includes(imageFile.id) ? {opacity: 0.5}: {}}/>
         </div>
     )
 }

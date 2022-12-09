@@ -1,10 +1,10 @@
 import React, {useState, useEffect} from 'react'
 import '../App.scss'
-import Map from './Map'
 import axios from 'axios'
 import Image from "./Image";
 import ImageModal from "./ImageModal";
 import ReactModal from 'react-modal';
+import AllTripsMap from "./AllTripsMap";
 
 function ViewTrip({open, tripId, onClose}) {
     // const tripId = window.location.pathname.split("/")[2];
@@ -19,10 +19,14 @@ function ViewTrip({open, tripId, onClose}) {
     const [parentTripName, setParentTripName] = useState('')
     const [parentTrips, setParentTrips] = useState([])
     const [tripActivities, setTripActivities] = useState([])
-    console.log(tripActivities)
+    const [openAddActivitiesModal, setOpenAddActivitiesModal] = useState(false)
+    const [activityIdForImages, setActivityIdForImages] = useState(null)
+    const [imageIdsForActivity, setImageIdsForActivity] = useState([])
+    const [locationsClickedStatus, setLocationsClickedStatus] = useState({})
+
     useEffect(() => {
         if (tripId && open) {
-            axios.get(`http://192.168.86.83:8090/trip/${tripId}`)
+            axios.get(`http://localhost:8090/trip/${tripId}`)
                 .then(response => {
                     setLocation(response.data.location)
                     setName(response.data.name)
@@ -34,7 +38,7 @@ function ViewTrip({open, tripId, onClose}) {
                         setTripActivities(response.data.activities)
                     }
                 })
-            axios.get(`http://192.168.86.83:8090/trip/${tripId}/images`)
+            axios.get(`http://localhost:8090/trip/${tripId}/images`)
                 .then(response => {
                     if (response.data.length <= 5) {
                         setImages(response.data);
@@ -42,11 +46,11 @@ function ViewTrip({open, tripId, onClose}) {
                         retrieveImage(response.data, 0)
                     }
                 })
-            axios.get(`http://192.168.86.83:8090/trip/${tripId}/activities`)
+            axios.get(`http://localhost:8090/trip/${tripId}/activities`)
                 .then(response => {
                     setTripActivities(response.data)
                 })
-            axios.get(`http://192.168.86.83:8090/parentTrips`)
+            axios.get(`http://localhost:8090/parentTrips`)
                 .then(response => {
                     setParentTrips(response.data)
                 })
@@ -55,7 +59,7 @@ function ViewTrip({open, tripId, onClose}) {
 
     function retrieveImage(imageList, index) {
         if (index < imageList.length) {
-            axios.get(`http://192.168.86.83:8090/image/${imageList[index].id}`)
+            axios.get(`http://localhost:8090/image/${imageList[index].id}`)
                 .then(response => {
                     imageList[index].image_location = response.data.image_location
                     setImages([...imageList])
@@ -65,14 +69,20 @@ function ViewTrip({open, tripId, onClose}) {
     }
 
     const editImage = image => {
-        setModalImage(image)
-        setOpenImageModal(true)
+        if (openAddActivitiesModal){
+            const imageIds = [...imageIdsForActivity]
+            imageIds.push(image.id)
+            setImageIdsForActivity(imageIds)
+        } else {
+            setModalImage(image)
+            setOpenImageModal(true)
+        }
     }
 
 
     const submitTrip = () => {
         if (tripId) {
-            axios.put(`http://192.168.86.83:8090/trip/${tripId}`, {
+            axios.put(`http://localhost:8090/trip/${tripId}`, {
                 name: name,
                 location: location,
                 startDate: startDate,
@@ -89,7 +99,7 @@ function ViewTrip({open, tripId, onClose}) {
                 console.log("Request complete! response:", res);
             });
         } else {
-            axios.post("http://192.168.86.83:8090/trip/create", {
+            axios.post("http://localhost:8090/trip/create", {
                 name: name,
                 location: location,
                 startDate: startDate,
@@ -103,11 +113,38 @@ function ViewTrip({open, tripId, onClose}) {
                     "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Requested-With",
                 }
             }).then(res => {
-                window.location.replace(`http://192.168.86.83:3000/trip/${res.data.id}`);
+                window.location.replace(`http://localhost:3000/trip/${res.data.id}`);
                 console.log("Request complete! response:", res);
             });
         }
     }
+
+    const submitImageActivities = () => {
+        axios.post(`http://localhost:8090/trip/${tripId}/activities`, {
+            activityId: activityIdForImages,
+            imageIds: imageIdsForActivity
+        }, {
+            headers: {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "DELETE, POST, GET, OPTIONS",
+                "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Requested-With",
+            }
+        }).then(res => {
+            console.log("Request complete! response:", res);
+            const activity = images.filter(image => image?.activity?.id === activityIdForImages)[0]?.activity
+            const updatedImages = images.map(image => {
+                if (imageIdsForActivity.indexOf(image.id) !== -1) {
+                    image.activity = activity
+                }
+                return image
+            })
+            setImages(updatedImages)
+            setImageIdsForActivity([])
+            setActivityIdForImages(null)
+            setOpenAddActivitiesModal(false)
+        });
+    }
+
 
     const addImages = e => {
         const newFiles = Object.values(e.target.files)
@@ -117,7 +154,7 @@ function ViewTrip({open, tripId, onClose}) {
         let index = 0
         reader.onloadend = function () {
             loadedImagesMap[`${index}`] = reader.result
-            axios.post(`http://192.168.86.83:8090/trip/${tripId}/images`, {
+            axios.post(`http://localhost:8090/trip/${tripId}/images`, {
                 image: reader.result.split(",")[1],
                 description: `${index}`
             })
@@ -140,6 +177,9 @@ function ViewTrip({open, tripId, onClose}) {
         if (!tripActivities.map(activity => activity.id).includes(updatedImage?.activity?.id)) {
             updatedTripActivities.push(updatedImage.activity)
             setTripActivities(updatedTripActivities)
+            setOpenAddActivitiesModal(true)
+            setActivityIdForImages(updatedImage.activity.id)
+            setImageIdsForActivity([updatedImage?.id])
         }
     }
 
@@ -167,33 +207,55 @@ function ViewTrip({open, tripId, onClose}) {
         return imageList.filter(image => {
             return image.image_location
         }).map(image => {
-            return <Image imageFile={image} editImage={editImage}/>
+            return <Image imageFile={image} editImage={editImage} imageIdsForNewActivity={imageIdsForActivity}/>
+        })
+    }
+
+    const filterTripsForMarkerEvent = (tripLocation) => {
+        setLocationsClickedStatus(obj => {
+            const updatedTripLocationsObj = { ...obj }
+            Object.keys(updatedTripLocationsObj).forEach(location => {
+                if (tripLocation !== location)
+                    updatedTripLocationsObj[location] = false
+            })
+            updatedTripLocationsObj[tripLocation] = !updatedTripLocationsObj[tripLocation]
+            return updatedTripLocationsObj
         })
     }
 
     const displayParentTripOptions = parentTrips.map(tripName => {
         return <option value={tripName}>{tripName}</option>
     })
-
+    console.log("add activitids to image modal: "+ openAddActivitiesModal)
     return (
         <ReactModal isOpen={open}>
         <div style={{width: "100%"}}>
+            {openAddActivitiesModal && <div id="add-activities-popup">
+                Add activity to other images: {imageIdsForActivity.length} selected <br/>
+                <button onClick={() => {
+                    setOpenAddActivitiesModal(false)
+                    setImageIdsForActivity([])
+                }}>Cancel</button>
+                <button onClick={submitImageActivities}>Done</button>
+            </div>}
             <div id="view-trip-header">
                 <h2>{name}</h2>
                 <button id="submit-trip-button" onClick={submitTrip}>
                     {tripId ? "Update Trip!" : "Create trip!"}
                 </button>
-                <button id="go-home-button" onClick={onClose}>
+                <button id="go-home-button" onClick={() => {
+                    setImages([]);
+                    onClose()
+                }}>
                     Close
                 </button>
             </div>
             <div style={{width: "100%"}}>
-                <Map location={location}/>
+                {/*<Map location={location}/>*/}
+                <AllTripsMap initialZoomLevel={10} includeZoom={true} locations={images ? images.map(image => image?.activity?.location).filter(activityLocation => activityLocation) : []} onMarkerEvent={filterTripsForMarkerEvent} locationsClickedStatus={locationsClickedStatus} location={location}/>
             </div>
-            <div
-                className="createTrip">
-                <div
-                    id="tripInfo">
+            <div className="createTrip">
+                <div id="tripInfo">
                     <div className="trip-info-input">
                         <label
                             htmlFor="name">

@@ -3,7 +3,6 @@ import ReactModal from 'react-modal';
 import axios from "axios";
 
 function ImageModal({open, modalImage, onClose, activities, imageActivity}) {
-    console.log(modalImage)
     const [imageDescription, setImageDescription] = useState(modalImage?.description ? modalImage?.description : "")
     const [isProfilePicture, setIsProfilePicture] = useState(modalImage?.trip?.trip_profile_image === modalImage?.id)
     const [activityName, setActivityName] = useState(modalImage?.activity?.name)
@@ -29,7 +28,7 @@ function ImageModal({open, modalImage, onClose, activities, imageActivity}) {
         setActivityId(null)
     }
     const saveImage = () => {
-        axios.put(`http://192.168.86.83:8090/image/${modalImage.id}`, {
+        axios.put(`http://localhost:8090/image/${modalImage.id}`, {
             description: imageDescription,
             isProfilePicture: isProfilePicture ? true : false,
             activityId: activityId,
@@ -45,7 +44,7 @@ function ImageModal({open, modalImage, onClose, activities, imageActivity}) {
     }
 
     const deleteImage = () => {
-        axios.delete(`http://192.168.86.83:8090/image/${modalImage.id}`)
+        axios.delete(`http://localhost:8090/image/${modalImage.id}`)
             .then(res => {
                 console.log("deleted image! response:", res);
             });
@@ -57,13 +56,11 @@ function ImageModal({open, modalImage, onClose, activities, imageActivity}) {
         let activityList = [{id: "", name: "none"}]
         if (activities) {
             activityList = activityList.concat(...activities)
-            console.log(activityList)
         }
         return activityList.map(activity => {
             return <option value={activity.id}>{activity.name}</option>
         })
     }
-    console.log(activityName)
     return (
         <ReactModal isOpen={open} id="view-image-modal">
             <div id="view-image-modal-div">

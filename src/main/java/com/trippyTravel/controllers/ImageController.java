@@ -1,12 +1,15 @@
 package com.trippyTravel.controllers;
 
+import com.trippyTravel.models.Activity;
 import com.trippyTravel.models.Image;
 import com.trippyTravel.models.Trip;
+import com.trippyTravel.repositories.ActivityRepository;
 import com.trippyTravel.repositories.ImageRepository;
 import com.trippyTravel.repositories.TripRepository;
 import com.trippyTravel.services.ImageService;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,12 +30,16 @@ public class ImageController {
     private final ImageRepository imagesRepository;
 
     @Autowired
+    private final ActivityRepository activityRepository;
+
+    @Autowired
     private final ImageService imageService;
 
-    public ImageController(TripRepository tripRepository, ImageRepository imagesRepository, ImageService imageService) {
+    public ImageController(TripRepository tripRepository, ImageRepository imagesRepository, ImageService imageService, ActivityRepository activityRepository) {
         this.tripRepository = tripRepository;
         this.imagesRepository = imagesRepository;
         this.imageService = imageService;
+        this.activityRepository = activityRepository;
     }
 
     @CrossOrigin
@@ -47,12 +54,25 @@ public class ImageController {
     @CrossOrigin
     @RequestMapping(value="/image/{id}", method= RequestMethod.PUT, produces="application/json")
     public @ResponseBody
-    void updateImage(@PathVariable long id, @RequestBody HashMap<String, Object> data, HttpServletRequest httpServletRequest) {
+    Image updateImage(@PathVariable long id, @RequestBody HashMap<String, Object> data, HttpServletRequest httpServletRequest) {
         Image image= imagesRepository.getOne(id);
         boolean isProfileImage = (boolean) data.get("isProfilePicture");
         if (data.get("description") != null) {
             String description = (String) data.get("description");
             image.setDescription(description);
+        }
+        if (data.get("activityName") != null) {
+            if (data.get("activityId") != null) {
+                String activityIdString = (String) data.get("activityId");
+                Long activityId = Long.parseLong(activityIdString);
+                Activity activity = activityRepository.getOne(activityId);
+                image.setActivity(activity);
+            } else {
+                System.out.println("activity location: " + data.get("activity.location"));
+                Activity activity = new Activity((String) data.get("activityLocation") ,(String) data.get("activityName"), image.getTrip());
+                Activity savedActivity = activityRepository.save(activity);
+                image.setActivity(savedActivity);
+            }
         }
         System.out.println("about to set is profile image");
         if (isProfileImage) {
@@ -60,7 +80,7 @@ public class ImageController {
             Trip trip = tripRepository.getOne(image.getTrip().getId());
             trip.setTrip_profile_image(Long.toString(image.getId()));
         }
-        imagesRepository.save(image);
+        return imagesRepository.save(image);
     }
 
     @CrossOrigin
@@ -101,5 +121,29 @@ public class ImageController {
         Path destinationFIle = Paths.get("/Users/jimmiemcbride/Pictures/mapapp", String.format("%s.jpeg", Long.toString(image.getId())));
         Files.write(destinationFIle, decodedImage);
         return image;
+    }
+
+    @CrossOrigin
+    @RequestMapping(value="/trip/{id}/activities", method=RequestMethod.GET, produces="application/json")
+    public @ResponseBody List<Activity> retrieveTripActivities(@PathVariable long id) {
+        Trip trip = tripRepository.getOne(id);
+        return activityRepository.findActivitiesByTrip(trip);
+    }
+
+    @CrossOrigin
+    @RequestMapping(value="/trip/{id}/activities", method=RequestMethod.POST, produces="application/json")
+    public @ResponseBody
+    ResponseEntity addActivitiesToTripImages(@PathVariable long id, @RequestBody HashMap<String, Object> data, HttpServletRequest httpServletReques) {
+        Trip trip = tripRepository.getOne(id);
+        int activityId = (int) data.get("activityId");
+        Activity activity = activityRepository.getOne((long) activityId);
+        List<Integer> imageIds = (List<Integer>) data.get("imageIds");
+        for (int imageId: imageIds) {
+            Image image = imagesRepository.getOne((long) imageId);
+            image.setActivity(activity);
+            imagesRepository.save(image);
+        }
+
+        return ResponseEntity.ok().build();
     }
 }
