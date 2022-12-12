@@ -1,8 +1,8 @@
 import React, {useRef, useEffect, useState} from 'react';
 import mapboxgl from '!mapbox-gl'; // eslint-disable-line import/no-webpack-loader-syntax
+import { accessToken} from "./tokens";
 
 function AllTripsMap({locations, onMarkerEvent, locationsClickedStatus, location, includeZoom = false, initialZoomLevel}) {
-    const accessToken = 'pk.eyJ1IjoiamFtZXMtbWNicmlkZSIsImEiOiJja2lqMHhudGEwdmtyMnJsY2VodHpkdmE1In0.q2A-peliF2vmbST01Es9TA';
     mapboxgl.accessToken = accessToken;
     const mapContainer = useRef(null);
     const map = useRef(null);
@@ -107,27 +107,33 @@ function AllTripsMap({locations, onMarkerEvent, locationsClickedStatus, location
         }
         console.log(zoomMap)
         const latLngDistanceFromCenterList = locationCoordinateList.map(coordinate => {
-            return Math.sqrt(
-            Math.pow(Math.abs(coordinate.lng) - Math.abs(lng), 2) +
-                Math.pow(Math.abs(coordinate.lat) - Math.abs(lat), 2)
-            )
+            return {
+                lng: Math.abs(Math.abs(coordinate.lng) - Math.abs(lng)),
+                lat: Math.abs(Math.abs(coordinate.lat) - Math.abs(lat))
+            }
         })
         let zoomChoice
         const zoomArray = latLngDistanceFromCenterList.map(coordinateDistance => {
-            const coordinateDistanceInMeters = coordinateDistance * 111139
+            const latDistanceInMeters = coordinateDistance.lat * 111139
+            const lngDistanceInMeters = coordinateDistance.lng * 111139
             for (let i =15; i>0; i--){
-                let zoomWidthInMeters = zoomMap[i] * pixelWidthOfPage
-                let zoomHeightInMeters = zoomMap[i] * pixelHeightOfPage
-                console.log(i, zoomWidthInMeters, zoomHeightInMeters, coordinateDistanceInMeters)
-                if (coordinateDistanceInMeters < zoomWidthInMeters) {
-                    return i - 2
+                let zoomWidthInMeters = (zoomMap[i] * pixelWidthOfPage)/2
+                let zoomHeightInMeters = (zoomMap[i] * pixelHeightOfPage)/2
+                if (lngDistanceInMeters < zoomWidthInMeters && latDistanceInMeters < zoomHeightInMeters) {
+                    return i
                 }
             }
         })
         if (zoomArray?.length > 0) {
             const zoomLevel = Math.min(...zoomArray)
-            console.log("setting zoom level to : " + zoomLevel)
-            map.current.setZoom(zoomLevel)
+            if (zoom !== zoomLevel) {
+                setZoom(zoomLevel)
+                console.log("setting zoom level to : " + zoomLevel)
+                setTimeout(() => {
+                    map.current.setZoom(zoomLevel)
+
+                }, 2000)
+            }
         }
     }
 
