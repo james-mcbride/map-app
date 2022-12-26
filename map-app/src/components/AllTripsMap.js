@@ -79,8 +79,8 @@ function AllTripsMap({locations, onMarkerEvent, locationsClickedStatus, location
                         const marker = new mapboxgl.Marker()
                             .setLngLat(coordinates)
                             .addTo(map.current);
-                        addListenersToMarker(marker, location)
-                        markersObj[location] = marker
+                        addListenersToMarker(marker, activityLocation)
+                        markersObj[activityLocation] = marker
                     }
                 })
             })
