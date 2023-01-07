@@ -4,7 +4,7 @@ import Map from './Map'
 import axios from 'axios'
 import ReactModal from "react-modal";
 
-function CreateTrip({open, onClose}) {
+function CreateTrip({open, onClose, locations}) {
     const [name, setName] = useState('');
     const [location, setLocation] = useState('')
     const [startDate, setStartDate] = useState('');
@@ -50,6 +50,10 @@ function CreateTrip({open, onClose}) {
         return <option value={tripName}>{tripName}</option>
     })
 
+    const previousLocationOptions = locations.filter(location => location && location.startsWith(location)).map(location =>{
+        return <option value={location}>location</option>
+    })
+
     return (
         <ReactModal isOpen={open}>
             <div className="createTrip">
@@ -65,7 +69,10 @@ function CreateTrip({open, onClose}) {
                     <br/>
                     <label htmlFor="location">
                         Location
-                        <input id="location" value={location} onChange={e => setLocation(e.target.value)}/>
+                        <input id="location" value={location} onChange={e => setLocation(e.target.value)} list="previousLocations"/>
+                        <datalist id="previousLocations">
+                            {previousLocationOptions}
+                        </datalist>
                     </label>
                     <br/>
                     <label htmlFor="startDate">

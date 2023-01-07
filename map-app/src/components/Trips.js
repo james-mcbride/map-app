@@ -130,7 +130,7 @@ function Trips(){
                 setOpenViewTripModal(false)
                 setViewTripId(null)
             }}/>
-            <CreateTrip open={openCreateTripModal} onClose={newTrip => {
+            <CreateTrip open={openCreateTripModal} locations={locations ? locations : [] } onClose={newTrip => {
                 setOpenCreateTripModal(false)
                 if (newTrip) {
                     setTrips([...trips, newTrip])
