@@ -29,6 +29,7 @@ function ViewTrip({open, tripId, onClose}) {
     const [parentTripSelected, setParentTripSelected] = useState(false)
     const [parentTripImages, setParentTripImages] = useState([])
     const [fetchedImagesForChildTrips, setFetchedImagesForChildTrips] = useState(false)
+    const [selectedChildTrip, setSelectedChildTrip] = useState(tripId)
 
     useEffect(() => {
         if (tripId && open) {
@@ -340,6 +341,7 @@ function ViewTrip({open, tripId, onClose}) {
                     setEndDate(trip.endDate.split(" ")[0])
                     setTripType(trip.tripType)
                     setParentTripName(trip.parentTrip)
+                    setSelectedChildTrip(trip.id)
                     if (trip.activities) {
                         setTripActivities([...tripActivities])
                     }
@@ -348,17 +350,19 @@ function ViewTrip({open, tripId, onClose}) {
         })
     }
 
-    const displayTripImages = () => {
+    const displayTripImages = (childTripId, parentTripSelectedBoolean ) => {
         if (parentTripSelected) {
             return displayParentTripImages()
-        } else{
+        } else if(fetchedImagesForChildTrips && !parentTripSelectedBoolean && childTripId !== tripId ){
+            return displayImages(parentTripImages[childTripId])
+        } else {
             return displayImages(images)
         }
     }
-    console.log("add activitids to image modal: "+ openAddActivitiesModal)
-    const locationList = images.map(image => image?.activity?.location).filter(activityLocation => activityLocation)
+    const locationActivityList = images.map(image => image?.activity?.location).filter(activityLocation => activityLocation)
+    const locationList = locationActivityList?.length > 0 ? locationActivityList : [location]
     return (
-        <ReactModal isOpen={open}>
+        <ReactModal isOpen={open} className="view-trip-modal">
         <div style={{width: "100%"}}>
             {openAddActivitiesModal && <div id="add-activities-popup">
                 Add activity to other images: {imageIdsForActivity.length} selected <br/>
@@ -401,7 +405,15 @@ function ViewTrip({open, tripId, onClose}) {
                     </button> }
             </div>
             <div style={{width: "100%"}}>
-                <AllTripsMap initialZoomLevel={10} includeZoom={true} locations={locationList && !parentTripSelected ? locationList : childTrips.map(trip => trip.location)} onMarkerEvent={filterTripsForMarkerEvent} locationsClickedStatus={locationsClickedStatus} location={location}/>
+                <AllTripsMap
+                    initialZoomLevel={10}
+                    includeZoom={true}
+                    locations={locationList && !parentTripSelected ? locationList : childTrips.map(trip => trip.location)}
+                    onMarkerEvent={filterTripsForMarkerEvent}
+                    locationsClickedStatus={locationsClickedStatus}
+                    location={location}
+                    viewingMultipleTrips={parentTripSelected}
+                />
             </div>
             {!parentTripSelected && <div className="createTrip">
                 <div id="tripInfo">
@@ -473,7 +485,7 @@ function ViewTrip({open, tripId, onClose}) {
             </div>
             }
             {tripId && (<div id="view-trip-images">
-                {displayTripImages()}
+                {displayTripImages(selectedChildTrip, parentTripSelected)}
             </div>)}
             <ImageModal modalImage={modalImage} open={openImageModal} onClose={closeImageModal} tripActivities imageActivity={modalImage?.activity} activities={tripActivities}/>
         </div>

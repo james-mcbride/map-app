@@ -83,7 +83,7 @@ function Trips(){
             return new Date(b.startDate) - new Date(a.startDate);
         }).map(trip => {
          return (
-             <div className="trip-tile">
+             <div className="trip-tile" key={`${trip.id}-filtered`}>
                  <div className="trip-tile-main">
                  <div className="trip-profile-image"><img src={trip?.trip_profile_image ? `data:image/jpeg;base64,${trip?.trip_profile_image}` : defaultImage}/></div>
                  <div>
@@ -105,7 +105,7 @@ function Trips(){
         const markerCurrentlySelected = markerSelected();
         return trips.filter(trip => !markerCurrentlySelected || (locationsClickedStatus[trip.location]  && markerCurrentlySelected)).map(trip => {
             return (
-                <div className="trip-tile">
+                <div className="trip-tile" key={trip.id}>
                     <div className="trip-tile-main">
                         <div className="trip-profile-image"><img src={trip?.trip_profile_image ? `data:image/jpeg;base64,${trip?.trip_profile_image}` : defaultImage}/></div>
                         <div>
@@ -135,6 +135,7 @@ function Trips(){
                 includeZoom={true}
                 onTripsPage={true}
                 retrievingLocations={retrievingTrips}
+                viewingMultipleTrips={true}
             />
             <div id="trip-list" style={{position: "relative"}}>
                 <button onClick={() => setFilterTrips(true)} id="filter-trips-button">Sort By Date</button>

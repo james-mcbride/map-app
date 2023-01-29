@@ -63,12 +63,19 @@
 @media screen and (min-width: 300px) {
 
   .trip-info-input {
-    width: 150px;
+    width: 120px;
+    margin: 10px;
   }
 
   .view-trip-image {
     width: 45vw;
     height: 49vw;
+    object-fit: cover;
+  }
+
+  .view-trip-modal .view-trip-image {
+    width: 40vw;
+    height: 40vw;
     object-fit: cover;
   }
 
@@ -84,6 +91,10 @@
       width: 150px;
       object-fit: cover;
     }
+  }
+
+  .map-container {
+    height: 250px;
   }
 
 }
@@ -113,6 +124,9 @@
       width: 200px;
       object-fit: cover;
     }
+  }
+  .map-container {
+    height: 400px;
   }
 }
 
@@ -223,4 +237,17 @@
   }
 }
 
+.view-trip-modal {
+  position: absolute;
+  inset: 40px;
+  border: 1px solid rgb(204, 204, 204);
+  background: rgb(255, 255, 255);
+  overflow: auto;
+  border-radius: 4px;
+  outline: none;
+  padding: 20px;
+  left: 10px;
+  top: 10px;
+  right: 10px;
+}
 

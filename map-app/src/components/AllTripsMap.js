@@ -2,7 +2,7 @@ import React, {useRef, useEffect, useState} from 'react';
 import mapboxgl from '!mapbox-gl'; // eslint-disable-line import/no-webpack-loader-syntax
 import { accessToken} from "./tokens";
 
-function AllTripsMap({locations, onMarkerEvent, locationsClickedStatus, location, includeZoom = false, initialZoomLevel, onTripsPage, retrievingLocations}) {
+function AllTripsMap({locations, onMarkerEvent, locationsClickedStatus, location, includeZoom = false, initialZoomLevel, onTripsPage, retrievingLocations, viewingMultipleTrips}) {
     mapboxgl.accessToken = accessToken;
     const mapContainer = useRef(null);
     const map = useRef(null);
@@ -66,6 +66,7 @@ function AllTripsMap({locations, onMarkerEvent, locationsClickedStatus, location
             setCurrentLocations(locations)
             for (const locationMarker in locationMarkersObj) {
                 if (!locations.includes(locationMarker)) {
+                    console.log("removing marker")
                     locationMarkersObj[locationMarker].remove()
                 }
             }
@@ -105,13 +106,41 @@ function AllTripsMap({locations, onMarkerEvent, locationsClickedStatus, location
         if (includeZoom && locationCoordinateList && lng && lat) {
             clearTimeout(lastTimeout)
             const timeout = setTimeout(() => {
-                getZoom()
+                if (viewingMultipleTrips) {
+                    const newCenterCoordinates = setNewMapCenter()
+                    getZoom(newCenterCoordinates)
+                } else {
+                    getZoom()
+                }
             }, 1000)
             setLastTimeout(timeout)
         }
     }, [locationCoordinateList, pixelWidthOfPage])
 
-    const getZoom = () => {
+    const setNewMapCenter = () => {
+        const locationCoordinateListFiltered = locationCoordinateList.filter(coordinate => coordinate?.lat && coordinate?.lng)
+        let middleLat = (Math.min(...locationCoordinateListFiltered.map(coordinate => coordinate.lat)) + Math.max(...locationCoordinateListFiltered.map(coordinate => coordinate.lat)))/2
+        let middleLng = (Math.min(...locationCoordinateListFiltered.map(coordinate => coordinate.lng)) + Math.max(...locationCoordinateListFiltered.map(coordinate => coordinate.lng)))/2
+        // locationCoordinateList.forEach(coordinates => {
+        //     totalLat += coordinates.lat
+        //     totalLng += coordinates.lng
+        // })
+        // const newCenterCoordinates = {
+        //     lng: totalLng/locationCoordinateList.length,
+        //     lat: totalLat/locationCoordinateList.length
+        // }
+        const newCenterCoordinates = {
+            lat: middleLat,
+            lng: middleLng
+        }
+        map.current.flyTo({
+            center: newCenterCoordinates
+        });
+        return newCenterCoordinates
+    }
+
+    const getZoom = (newCenterCoordinates = null) => {
+        console.log("setting zoom")
         if (pixelWidthOfPage) {
             const zoom15 = 2.389
             const zoomMap = {
@@ -120,14 +149,16 @@ function AllTripsMap({locations, onMarkerEvent, locationsClickedStatus, location
             for (let i = 14; i >= 0; i--) {
                 zoomMap[i] = zoom15 * Math.pow(2, (15 - i))
             }
-            console.log(zoomMap)
+            console.log("test 1")
             const latLngDistanceFromCenterList = locationCoordinateList.map(coordinate => {
                 return {
-                    lng: Math.abs(Math.abs(coordinate.lng) - Math.abs(lng)),
-                    lat: Math.abs(Math.abs(coordinate.lat) - Math.abs(lat))
+                    lng: Math.abs(Math.abs(coordinate.lng) - Math.abs(newCenterCoordinates ? newCenterCoordinates.lng : lng)),
+                    lat: Math.abs(Math.abs(coordinate.lat) - Math.abs(newCenterCoordinates ? newCenterCoordinates.lat : lat))
                 }
             })
-            let zoomChoice
+            console.log("test 2")
+            console.log("pixel height: " + pixelHeightOfPage)
+            console.log("pixel width: " + pixelWidthOfPage)
             const zoomArray = latLngDistanceFromCenterList.map(coordinateDistance => {
                 const latDistanceInMeters = coordinateDistance.lat * 111139
                 const lngDistanceInMeters = coordinateDistance.lng * 111139
@@ -139,16 +170,17 @@ function AllTripsMap({locations, onMarkerEvent, locationsClickedStatus, location
                     }
                 }
             })
+            console.log("test 3")
             if (zoomArray?.length > 0 && !retrievingLocations) {
-                console.log(locations)
-                console.log("done retrieving locatins, lets zoom!")
-                const zoomLevel = Math.min(...zoomArray)
+                zoomArray.forEach(zoomNum => console.log(zoomNum))
+                console.log("test 4")
+                const zoomLevel = Math.min(...zoomArray.filter(zoomNum => zoomNum))
+                console.log("zoom level: " + zoomLevel)
+                // const newZoom = newCenterCoordinates ? zoomLevel - 1 : zoomLevel
                 if (zoom !== zoomLevel) {
                     setZoom(zoomLevel)
-                    console.log("setting zoom level to : " + zoomLevel)
                     setTimeout(() => {
                         map.current.setZoom(zoomLevel)
-
                     }, 2000)
                 }
             }
@@ -172,7 +204,7 @@ function AllTripsMap({locations, onMarkerEvent, locationsClickedStatus, location
 
     return (
         <div id={onTripsPage ? 'allTripsMap' : 'viewTripMap'}>
-            <div ref={mapContainer} className="map-container" style={{height: 400}}/>
+            <div ref={mapContainer} className="map-container"/>
         </div>
     );
 }
