@@ -28,7 +28,7 @@ function ImageModal({open, modalImage, onClose, activities, imageActivity}) {
         setActivityId(null)
     }
     const saveImage = () => {
-        axios.put(`http://localhost:8090/image/${modalImage.id}`, {
+        axios.put(`http://192.168.86.102:8090/image/${modalImage.id}`, {
             description: imageDescription,
             isProfilePicture: isProfilePicture ? true : false,
             activityId: activityId,
@@ -44,7 +44,7 @@ function ImageModal({open, modalImage, onClose, activities, imageActivity}) {
     }
 
     const deleteImage = () => {
-        axios.delete(`http://localhost:8090/image/${modalImage.id}`)
+        axios.delete(`http://192.168.86.102:8090/image/${modalImage.id}`)
             .then(res => {
                 console.log("deleted image! response:", res);
             });

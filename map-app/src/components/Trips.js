@@ -3,6 +3,7 @@ import axios from "axios";
 import AllTripsMap from "./AllTripsMap";
 import ViewTrip from "./ViewTrip";
 import CreateTrip from "./CreateTrip";
+import defaultImage from './images/airplane.png'
 
 function Trips(){
     const [trips, setTrips] = useState([])
@@ -13,14 +14,16 @@ function Trips(){
     const [viewTripId, setViewTripId] = useState(null)
     const [filterTrips, setFilterTrips] = useState(false)
     const [openCreateTripModal, setOpenCreateTripModal] = useState(false)
+    const [retrievingTrips, setRetrievingTrips] = useState(false)
 
     useEffect(() => {
         retrieveTrips(0)
+        setRetrievingTrips(true)
     }, []);
 
     function retrieveTrips(index) {
-        if (!numTrips || index * 10 < numTrips) {
-            axios.get(`http://localhost:8090/trip/page/${index}`)
+        if (!numTrips || index * 5 < numTrips) {
+            axios.get(`http://192.168.86.102:8090/trip/page/${index}`)
                 .then(response => {
                     if (index === 0) {
                         setNumTrips(num => num + response.data.numTrips)
@@ -40,8 +43,10 @@ function Trips(){
                     })
                     const numberOfTrips = numTrips ? numTrips : response.data.numTrips
                     console.log(index, numberOfTrips)
-                    if ((10 + index * 10) < numberOfTrips) {
+                    if ((5 + index * 5) < numberOfTrips) {
                         retrieveTrips(index+=1)
+                    } else {
+                        setRetrievingTrips(false)
                     }
                 })
         }
@@ -80,7 +85,7 @@ function Trips(){
          return (
              <div className="trip-tile">
                  <div className="trip-tile-main">
-                 <div className="trip-profile-image"><img src={`data:image/jpeg;base64,${trip?.trip_profile_image}`}/></div>
+                 <div className="trip-profile-image"><img src={trip?.trip_profile_image ? `data:image/jpeg;base64,${trip?.trip_profile_image}` : defaultImage}/></div>
                  <div>
                      <h2>{trip.name}</h2>
                      <h4>{trip.location}</h4>
@@ -102,7 +107,7 @@ function Trips(){
             return (
                 <div className="trip-tile">
                     <div className="trip-tile-main">
-                        <div className="trip-profile-image"><img src={`data:image/jpeg;base64,${trip?.trip_profile_image}`}/></div>
+                        <div className="trip-profile-image"><img src={trip?.trip_profile_image ? `data:image/jpeg;base64,${trip?.trip_profile_image}` : defaultImage}/></div>
                         <div>
                             <h2>{trip.name}</h2>
                             <h4>{trip.location}</h4>
@@ -121,14 +126,35 @@ function Trips(){
     return (
         <div style={{position: "relative"}}>
             <button className="ui button" type="button" onClick={() => setOpenCreateTripModal(true)} style={{position: "absolute",right: 10, top: 10, background: "gold", zIndex: 5}}>Create Trip</button>
-            <AllTripsMap initialZoomLevel={2} locations={locations ? locations : []} onMarkerEvent={filterTripsForMarkerEvent} locationsClickedStatus={locationsClickedStatus}/>
+            <AllTripsMap
+                initialZoomLevel={2}
+                locations={locations ? locations : []}
+                onMarkerEvent={filterTripsForMarkerEvent}
+                locationsClickedStatus={locationsClickedStatus}
+                location="Memphis, TN"
+                includeZoom={true}
+                onTripsPage={true}
+                retrievingLocations={retrievingTrips}
+            />
             <div id="trip-list" style={{position: "relative"}}>
                 <button onClick={() => setFilterTrips(true)} id="filter-trips-button">Sort By Date</button>
                 {filterTrips ? showFilteredTrips() : showTrips()}
             </div>
-            <ViewTrip open={openViewTripModal} tripId={viewTripId} onClose={() => {
+            <ViewTrip open={openViewTripModal} tripId={viewTripId} onClose={deletedTrip => {
                 setOpenViewTripModal(false)
                 setViewTripId(null)
+                if (deletedTrip) {
+                    let numDeletedTripLocation = 0
+                    trips.forEach(trip => {
+                        if (deletedTrip.location === trip.location) {
+                            numDeletedTripLocation++
+                        }
+                    })
+                    if (numDeletedTripLocation === 1) {
+                        setLocations(locations.filter(location => location !== deletedTrip.location))
+                    }
+                    setTrips(trips.filter(trip => trip.id !== deletedTrip.id))
+                }
             }}/>
             <CreateTrip open={openCreateTripModal} locations={locations ? locations : [] } onClose={newTrip => {
                 setOpenCreateTripModal(false)
