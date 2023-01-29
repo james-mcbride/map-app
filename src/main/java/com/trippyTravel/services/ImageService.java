@@ -24,6 +24,7 @@ public class ImageService {
 
     public String getEncodedImageFileById(String id) throws IOException {
         Path destinationFIle = Paths.get("/Users/jimmiemcbride/Pictures/mapapp", String.format("%s.jpeg", id));
+        System.out.println("getting image from file with id: " + id);
         byte[] imageBytes = Files.readAllBytes(destinationFIle);
         return Base64.encodeBase64String(imageBytes);
     }

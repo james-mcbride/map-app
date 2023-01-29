@@ -19,13 +19,15 @@ public interface TripRepository extends JpaRepository<Trip,Long> {
     @Query(nativeQuery = true, value="SELECT DISTINCT parent_trip FROM trips")
     List<String> findAllParentTrips();
 
-    @Query(nativeQuery = true, value="SELECT * from trips LIMIT 10 offset :offset")
+    @Query(nativeQuery = true, value="SELECT * from trips LIMIT 5 offset :offset")
     List<Trip> findTripsWithPageLimit(@Param("offset") long offset);
 
     List<Trip> findAllByOrderByIdDesc();
 
     @Query(nativeQuery = true, value="SELECT COUNT(*) from trips")
     long getNumTrips();
+
+    List<Trip> findTripsByParentTrip(String parentTripName);
 
 }
 

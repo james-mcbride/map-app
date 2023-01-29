@@ -23,17 +23,21 @@ public class TripController {
     @Autowired
     private final ImageService imageService;
 
-    public TripController(TripRepository tripRepository, ImageRepository imageRepository, ImageService imageService) {
+    @Autowired
+    private final ActivityRepository activityRepository;
+
+    public TripController(TripRepository tripRepository, ImageRepository imageRepository, ImageService imageService, ActivityRepository activityRepository) {
         this.tripRepository = tripRepository;
         this.imageRepository = imageRepository;
         this.imageService = imageService;
+        this.activityRepository = activityRepository;
     }
 
     @CrossOrigin
     @RequestMapping(value = "/trip/page/{page}", method = RequestMethod.GET, produces = "application/json")
     public @ResponseBody
     Map<String, Object> retrieveAllTrips(@PathVariable long page) throws IOException {
-        List<Trip> trips = tripRepository.findTripsWithPageLimit(page * 10);
+        List<Trip> trips = tripRepository.findTripsWithPageLimit(page * 5);
         long count = tripRepository.getNumTrips();
         List<String> locations = new ArrayList<>();
         List<Trip> tripsSubList = new ArrayList<>();
@@ -90,9 +94,33 @@ public class TripController {
     }
 
     @CrossOrigin
+    @RequestMapping(value="/trip/{id}", method=RequestMethod.DELETE, produces="application/json")
+    public @ResponseBody String deleteTrip(@PathVariable long id) {
+        Trip trip = tripRepository.getOne(id);
+        List<Activity> activities = activityRepository.findActivitiesByTrip(trip);
+        for (Activity activity : activities) {
+            activityRepository.delete(activity);
+        }
+        List<Image> images = imageRepository.findImagesByTrip(trip);
+        for (Image image: images) {
+            imageRepository.delete(image);
+        }
+        tripRepository.delete(trip);
+        return "SUCCESS";
+    }
+
+    @CrossOrigin
     @RequestMapping(value="/parentTrips", method=RequestMethod.GET, produces="application/json")
     public @ResponseBody List<String> retrieveParentTrips() {
         return tripRepository.findAllParentTrips();
+    }
+
+    @CrossOrigin
+    @RequestMapping(value="/parentTrip", method=RequestMethod.GET, produces="application/json")
+    public @ResponseBody List<Trip> retrieveTripsForParentTrip(@RequestParam String parentTripName) {
+        String nameWithCorrectCharacters = parentTripName.replace("%20", " ");
+        System.out.println(nameWithCorrectCharacters);
+        return tripRepository.findTripsByParentTrip(nameWithCorrectCharacters);
     }
 
 }
