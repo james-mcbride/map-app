@@ -23,7 +23,7 @@ function Trips(){
 
     function retrieveTrips(index) {
         if (!numTrips || index * 5 < numTrips) {
-            axios.get(`http://192.168.86.102:8090/trip/page/${index}`)
+            axios.get(`http://192.168.86.134:8090/trip/page/${index}`)
                 .then(response => {
                     if (index === 0) {
                         setNumTrips(num => num + response.data.numTrips)

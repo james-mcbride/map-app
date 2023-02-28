@@ -115,7 +115,7 @@ function AllTripsMap({locations, onMarkerEvent, locationsClickedStatus, location
             }, 1000)
             setLastTimeout(timeout)
         }
-    }, [locationCoordinateList, pixelWidthOfPage])
+    }, [locationCoordinateList, pixelWidthOfPage, lng, lat])
 
     const setNewMapCenter = () => {
         const locationCoordinateListFiltered = locationCoordinateList.filter(coordinate => coordinate?.lat && coordinate?.lng)
@@ -176,6 +176,8 @@ function AllTripsMap({locations, onMarkerEvent, locationsClickedStatus, location
                 console.log("test 4")
                 const zoomLevel = Math.min(...zoomArray.filter(zoomNum => zoomNum))
                 console.log("zoom level: " + zoomLevel)
+                console.log(lng)
+                console.log(lat)
                 // const newZoom = newCenterCoordinates ? zoomLevel - 1 : zoomLevel
                 if (zoom !== zoomLevel) {
                     setZoom(zoomLevel)

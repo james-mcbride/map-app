@@ -2,12 +2,13 @@ import React, {useState, useEffect} from 'react';
 import ReactModal from 'react-modal';
 import axios from "axios";
 
-function ImageModal({open, modalImage, onClose, activities, imageActivity}) {
+function ImageModal({open, modalImage, onClose, activities, imageActivity, editingTrip}) {
     const [imageDescription, setImageDescription] = useState(modalImage?.description ? modalImage?.description : "")
     const [isProfilePicture, setIsProfilePicture] = useState(modalImage?.trip?.trip_profile_image === modalImage?.id)
     const [activityName, setActivityName] = useState(modalImage?.activity?.name)
     const [activityLocation, setActivityLocation] = useState(modalImage?.activity?.location)
     const [activityId, setActivityId] = useState(modalImage?.activity?.id)
+    const [editingImage, setEditingImage] = useState(false)
 
     useEffect(() => {
         if (modalImage) {
@@ -26,9 +27,10 @@ function ImageModal({open, modalImage, onClose, activities, imageActivity}) {
         setActivityLocation(null)
         setActivityName(null)
         setActivityId(null)
+        setEditingImage(false)
     }
     const saveImage = () => {
-        axios.put(`http://192.168.86.102:8090/image/${modalImage.id}`, {
+        axios.put(`http://192.168.86.134:8090/image/${modalImage.id}`, {
             description: imageDescription,
             isProfilePicture: isProfilePicture ? true : false,
             activityId: activityId,
@@ -44,7 +46,7 @@ function ImageModal({open, modalImage, onClose, activities, imageActivity}) {
     }
 
     const deleteImage = () => {
-        axios.delete(`http://192.168.86.102:8090/image/${modalImage.id}`)
+        axios.delete(`http://192.168.86.134:8090/image/${modalImage.id}`)
             .then(res => {
                 console.log("deleted image! response:", res);
             });
@@ -63,7 +65,10 @@ function ImageModal({open, modalImage, onClose, activities, imageActivity}) {
     }
     return (
         <ReactModal isOpen={open} id="view-image-modal">
-            <div id="view-image-modal-div">
+            <div id="view-image-modal-div" style={!editingImage ? {height: "88%"} : {}}>
+                <button id="edit-image-modal-button" onClick={() => setEditingImage(!editingImage)}>
+                    {editingImage ? "View Image" : "Edit Image"}
+                </button>
                 <button id="close-image-modal-button" onClick={() => {
                     clearState();
                     onClose();
@@ -72,49 +77,60 @@ function ImageModal({open, modalImage, onClose, activities, imageActivity}) {
                 </button>
                 <img src={`data:image/jpeg;base64,${modalImage?.image_location}`}/>
             </div>
-            <div id="image-modal-input">
-                <label>
-                    Image Description:
-                    <input value={imageDescription} onChange={e => setImageDescription(e.target.value)}/>
-                </label>
+            {editingImage ? <div>
+                    <div id="image-modal-input">
+                        <label>
+                            Image Description:
+                            <input value={imageDescription} onChange={e => setImageDescription(e.target.value)}/>
+                        </label>
 
-            </div>
-            <div id="image-modal-activity">
-                <label htlmFor="activitySelect">
-                    Activity
-                    <select id="activitySelect" value={activityId} onChange={e => {
-                        setActivityId(e.target.value)
-                        activities.forEach(activity => {
-                            if (activity.id === e.target.value) {}
-                            setActivityLocation(activity.location)
-                            setActivityName(activity.name)
-                        })
-                    }}>
-                        {activityOptions()}
-                    </select>
-                </label>
-                <label htmlFor="newActivityNameInput">
-                    Activity Name
-                    <input id="newActivityNameInput" value={activityName} onChange={e => setActivityName(e.target.value)} />
-                </label>
-                <label htmlFor="newActivityLocationInput">
-                    Activity Location
-                    <input id="newActivityLocationInput" value={activityLocation} onChange={e => setActivityLocation(e.target.value)} />
-                </label>
-            </div>
-            <div id="save-image-div">
-                <label>
-                    Profile Picture:
-                    <input type="checkbox" value={isProfilePicture}
-                           onChange={e => setIsProfilePicture(e.target.checked)}/>
-                </label>
-                <button onClick={saveImage}>
-                    Save photo
-                </button>
-                <button onClick={deleteImage}>
-                    Delete photo
-                </button>
-            </div>
+                    </div>
+                    <div id="image-modal-activity">
+                        <label htlmFor="activitySelect">
+                            Activity
+                            <select id="activitySelect" value={activityId} onChange={e => {
+                                setActivityId(e.target.value)
+                                activities.forEach(activity => {
+                                    if (activity.id === e.target.value) {
+                                    }
+                                    setActivityLocation(activity.location)
+                                    setActivityName(activity.name)
+                                })
+                            }}>
+                                {activityOptions()}
+                            </select>
+                        </label>
+                        <label htmlFor="newActivityNameInput">
+                            Activity Name
+                            <input id="newActivityNameInput" value={activityName}
+                                   onChange={e => setActivityName(e.target.value)}/>
+                        </label>
+                        <label htmlFor="newActivityLocationInput">
+                            Activity Location
+                            <input id="newActivityLocationInput" value={activityLocation}
+                                   onChange={e => setActivityLocation(e.target.value)}/>
+                        </label>
+                    </div>
+                    <div id="save-image-div">
+                        <label>
+                            Profile Picture:
+                            <input type="checkbox" value={isProfilePicture}
+                                   onChange={e => setIsProfilePicture(e.target.checked)}/>
+                        </label>
+                        <button onClick={saveImage}>
+                            Save photo
+                        </button>
+                        <button onClick={deleteImage}>
+                            Delete photo
+                        </button>
+                    </div>
+                </div> :
+                <div style={{textAlign: "center"}}>
+                    <h2>{imageDescription}</h2>
+                    {activityName ?
+                        <h4 id="view-trip-image">{activityName} — <span>{activityLocation}</span></h4> : null}
+                </div>
+            }
 
         </ReactModal>
     )
