@@ -33,7 +33,9 @@ function AllTripsMap({locations, onMarkerEvent, locationsClickedStatus, location
                                 center: {
                                     lng: data.features[0].center[0],
                                     lat: data.features[0].center[1]
-                                }
+                                },
+                                duration: 1000,
+                                animate: true
                             });
                         }
                     })
@@ -134,7 +136,9 @@ function AllTripsMap({locations, onMarkerEvent, locationsClickedStatus, location
             lng: middleLng
         }
         map.current.flyTo({
-            center: newCenterCoordinates
+            center: newCenterCoordinates,
+            animate:true,
+            duration: 1000
         });
         return newCenterCoordinates
     }
@@ -182,8 +186,8 @@ function AllTripsMap({locations, onMarkerEvent, locationsClickedStatus, location
                 if (zoom !== zoomLevel) {
                     setZoom(zoomLevel)
                     setTimeout(() => {
-                        map.current.setZoom(zoomLevel)
-                    }, 2000)
+                        map.current.zoomTo(zoomLevel-.25, {duration: 1000, animate: true})
+                    }, 500)
                 }
             }
         }

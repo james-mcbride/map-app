@@ -23,7 +23,7 @@ function Trips(){
 
     function retrieveTrips(index) {
         if (!numTrips || index * 5 < numTrips) {
-            axios.get(`http://192.168.86.134:8090/trip/page/${index}`)
+            axios.get(`http://192.168.86.169:8090/trip/page/${index}`)
                 .then(response => {
                     if (index === 0) {
                         setNumTrips(num => num + response.data.numTrips)
@@ -125,7 +125,7 @@ function Trips(){
 
     return (
         <div style={{position: "relative"}}>
-            <button className="ui button" type="button" onClick={() => setOpenCreateTripModal(true)} style={{position: "absolute",right: 10, top: 10, background: "gold", zIndex: 5}}>Create Trip</button>
+            <button className="ui button" id="create-trip-button" type="button" onClick={() => setOpenCreateTripModal(true)}>Create Trip</button>
             <AllTripsMap
                 initialZoomLevel={2}
                 locations={locations ? locations : []}

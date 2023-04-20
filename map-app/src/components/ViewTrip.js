@@ -34,7 +34,7 @@ function ViewTrip({open, tripId, onClose}) {
 
     useEffect(() => {
         if (tripId && open) {
-            axios.get(`http://192.168.86.134:8090/trip/${tripId}`)
+            axios.get(`http://192.168.86.169:8090/trip/${tripId}`)
                 .then(response => {
                     setLocation(response.data.location)
                     setName(response.data.name)
@@ -49,7 +49,7 @@ function ViewTrip({open, tripId, onClose}) {
                         getParentTrip(response.data.parentTrip)
                     }
                 })
-            axios.get(`http://192.168.86.134:8090/trip/${tripId}/images`)
+            axios.get(`http://192.168.86.169:8090/trip/${tripId}/images`)
                 .then(response => {
                     if (response.data.length <= 5) {
                         setImages(response.data);
@@ -57,11 +57,11 @@ function ViewTrip({open, tripId, onClose}) {
                         retrieveImage(response.data, 0)
                     }
                 })
-            axios.get(`http://192.168.86.134:8090/trip/${tripId}/activities`)
+            axios.get(`http://192.168.86.169:8090/trip/${tripId}/activities`)
                 .then(response => {
                     setTripActivities(response.data)
                 })
-            axios.get(`http://192.168.86.134:8090/parentTrips`)
+            axios.get(`http://192.168.86.169:8090/parentTrips`)
                 .then(response => {
                     setParentTrips(response.data)
                 })
@@ -69,7 +69,7 @@ function ViewTrip({open, tripId, onClose}) {
     }, [open])
 
     const getParentTrip = parentTripName => {
-        axios.get(`http://192.168.86.134:8090/parentTrip`, {
+        axios.get(`http://192.168.86.169:8090/parentTrip`, {
             params: {
                 parentTripName: parentTripName
             }
@@ -88,7 +88,7 @@ function ViewTrip({open, tripId, onClose}) {
 
     function retrieveImage(imageList, index) {
         if (index < imageList.length) {
-            axios.get(`http://192.168.86.134:8090/image/${imageList[index].id}`)
+            axios.get(`http://192.168.86.169:8090/image/${imageList[index].id}`)
                 .then(response => {
                     imageList[index].image_location = response.data.image_location
                     setImages([...imageList])
@@ -98,7 +98,7 @@ function ViewTrip({open, tripId, onClose}) {
     }
 
     const retrieveImagesForChildTrip = tripId => {
-        axios.get(`http://192.168.86.134:8090/trip/${tripId}/images`)
+        axios.get(`http://192.168.86.169:8090/trip/${tripId}/images`)
             .then(response => {
                 if (response.data.length <= 5) {
                     // const updatedImages = [...parentTripImages]
@@ -113,7 +113,7 @@ function ViewTrip({open, tripId, onClose}) {
 
     function retrieveImageForChildTrip(imageList, index) {
         if (index < imageList.length) {
-            axios.get(`http://192.168.86.134:8090/image/${imageList[index].id}`)
+            axios.get(`http://192.168.86.169:8090/image/${imageList[index].id}`)
                 .then(response => {
                     imageList[index].image_location = response.data.image_location
                     setParentTripImages(currentParentTripImages => {
@@ -139,7 +139,7 @@ function ViewTrip({open, tripId, onClose}) {
     }
 
     const deleteTrip = () => {
-        axios.delete(`http://192.168.86.134:8090/trip/${tripId}`, {
+        axios.delete(`http://192.168.86.169:8090/trip/${tripId}`, {
             headers: {
                 "Access-Control-Allow-Origin": "*",
                 "Access-Control-Allow-Methods": "DELETE, POST, GET, OPTIONS",
@@ -153,7 +153,7 @@ function ViewTrip({open, tripId, onClose}) {
     }
     const submitTrip = () => {
         if (tripId) {
-            axios.put(`http://192.168.86.134:8090/trip/${tripId}`, {
+            axios.put(`http://192.168.86.169:8090/trip/${tripId}`, {
                 name: name,
                 location: location,
                 startDate: startDate,
@@ -170,7 +170,7 @@ function ViewTrip({open, tripId, onClose}) {
                 console.log("Request complete! response:", res);
             });
         } else {
-            axios.post("http://192.168.86.134:8090/trip/create", {
+            axios.post("http://192.168.86.169:8090/trip/create", {
                 name: name,
                 location: location,
                 startDate: startDate,
@@ -184,7 +184,7 @@ function ViewTrip({open, tripId, onClose}) {
                     "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Requested-With",
                 }
             }).then(res => {
-                window.location.replace(`http://192.168.86.134:3000/trip/${res.data.id}`);
+                window.location.replace(`http://192.168.86.169:3000/trip/${res.data.id}`);
                 console.log("Request complete! response:", res);
             });
         }
@@ -209,7 +209,7 @@ function ViewTrip({open, tripId, onClose}) {
     }
 
     const submitImageActivities = () => {
-        axios.post(`http://192.168.86.134:8090/trip/${tripId}/activities`, {
+        axios.post(`http://192.168.86.169:8090/trip/${tripId}/activities`, {
             activityId: activityIdForImages,
             imageIds: imageIdsForActivity
         }, {
@@ -243,7 +243,7 @@ function ViewTrip({open, tripId, onClose}) {
         let index = 0
         reader.onloadend = function () {
             loadedImagesMap[`${index}`] = reader.result
-            axios.post(`http://192.168.86.134:8090/trip/${tripId}/images`, {
+            axios.post(`http://192.168.86.169:8090/trip/${tripId}/images`, {
                 image: reader.result.split(",")[1],
                 description: `${index}`
             })
