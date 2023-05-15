@@ -29,5 +29,7 @@ public interface TripRepository extends JpaRepository<Trip,Long> {
 
     List<Trip> findTripsByParentTrip(String parentTripName);
 
+    List<Trip> findTripsByCategory(String category);
+
 }
 

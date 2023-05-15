@@ -13,7 +13,7 @@ function ImageModal({open, modalImage, onClose, activities, imageActivity, editi
     useEffect(() => {
         if (modalImage) {
             setImageDescription(modalImage?.description)
-            setIsProfilePicture(modalImage?.trip?.trip_profile_image === modalImage?.id)
+            setIsProfilePicture(Number(modalImage?.trip?.trip_profile_image) === Number(modalImage?.id))
             setActivityName(modalImage?.activity?.name)
             setActivityLocation(modalImage?.activity?.location)
             setActivityId(modalImage?.activity?.id)
@@ -33,13 +33,14 @@ function ImageModal({open, modalImage, onClose, activities, imageActivity, editi
         axios.put(`http://192.168.86.169:8090/image/${modalImage.id}`, {
             description: imageDescription,
             isProfilePicture: isProfilePicture ? true : false,
-            activityId: activityId,
+            activityId: activityId?.toString(),
             activityLocation: activityLocation,
             activityName: activityName
         }).then(res => {
             const updatedImage = res.data
             modalImage.description = imageDescription;
             modalImage.activity = updatedImage?.activity
+            modalImage.isProfilePicture = isProfilePicture
             clearState();
             onClose(modalImage, "update")
         });
@@ -65,7 +66,7 @@ function ImageModal({open, modalImage, onClose, activities, imageActivity, editi
     }
     return (
         <ReactModal isOpen={open} id="view-image-modal">
-            <div id="view-image-modal-div" style={!editingImage ? {height: "88%"} : {}}>
+            <div id="view-image-modal-div" style={!editingImage ? {height: "87%"} : {}}>
                 <button id="edit-image-modal-button" onClick={() => setEditingImage(!editingImage)}>
                     {editingImage ? "View Image" : "Edit Image"}
                 </button>
@@ -114,8 +115,8 @@ function ImageModal({open, modalImage, onClose, activities, imageActivity, editi
                     <div id="save-image-div">
                         <label>
                             Profile Picture:
-                            <input type="checkbox" value={isProfilePicture}
-                                   onChange={e => setIsProfilePicture(e.target.checked)}/>
+                            <input type="checkbox" checked={isProfilePicture}
+                                   onChange={() => setIsProfilePicture(!isProfilePicture)}/>
                         </label>
                         <button onClick={saveImage}>
                             Save photo

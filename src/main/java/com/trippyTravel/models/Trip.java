@@ -62,19 +62,43 @@ public class Trip {
     @Column(name = "parent_trip")
     private String parentTrip;
 
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    @Column(name = "category")
+    private String category;
+
+    public String getCategoryItem() {
+        return categoryItem;
+    }
+
+    public void setCategoryItem(String categoryItem) {
+        this.categoryItem = categoryItem;
+    }
+
+    @Column(name = "categoryItem")
+    private String categoryItem;
+
     public Trip() {
     }
 
     public Trip(Long id) {
         this.id = id;
     }
-    public Trip(String location, String name, String startDate, String endDate, String tripType, String parentTrip) {
+    public Trip(String location, String name, String startDate, String endDate, String tripType, String parentTrip, String category, String categoryItem) {
         this.location = location;
         this.name = name;
         this.startDate = startDate;
         this.endDate = endDate;
         this.tripType = tripType;
         this.parentTrip = parentTrip;
+        this.category = category;
+        this.categoryItem = categoryItem;
     }
 
     public Trip(String location, String name, String description, String trip_profile_image, String startDate, String endDate, List<User> users, List<Image> images, String tripType, String parentTrip) {

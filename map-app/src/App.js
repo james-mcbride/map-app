@@ -3,6 +3,7 @@ import { browserHistory } from 'react-router';
 import {BrowserRouter, Route, Redirect, Link} from 'react-router-dom'
 import Trips from "./components/Trips";
 import ViewTrip from "./components/ViewTrip";
+import NflMapContainer from "./components/categories/NflMapContainer";
 
 
 function App() {
@@ -17,6 +18,9 @@ function App() {
                 </Route>
                 <Route exact path="/trip/:id">
                     <ViewTrip />
+                </Route>
+                <Route exact path="/nfl">
+                    <NflMapContainer />
                 </Route>
             </BrowserRouter>
         </div>

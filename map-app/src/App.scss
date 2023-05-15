@@ -1,3 +1,7 @@
+html{
+  overflow-x: hidden;
+  width: 100%;
+}
 #tripInfo {
   display: flex;
   flex-wrap: wrap;
@@ -33,6 +37,7 @@ button {
 }
 
 .createTrip {
+  margin-top: 25px;
   display: flex;
   label {
     //margin: 5px 15px;
@@ -84,9 +89,16 @@ button {
 
 @media screen and (min-width: 300px) {
 
-  .trip-info-input {
+  .view-trip-modal  {
+    inset: 10px
+    }
+
+    .trip-info-input {
     width: 120px;
     margin: 10px;
+      input{
+        width: 120px;
+      }
   }
 
   .view-trip-image {
@@ -99,7 +111,7 @@ button {
   .trip-tile {
     border: 1px solid gray;
     padding: 25px;
-    width: calc((100vw - 103px)/2);
+    width: calc(100vw - 52px);
   }
 
   .trip-profile-image {
@@ -115,6 +127,38 @@ button {
     height: 250px;
   }
 
+  #image-modal-input, #image-modal-activity {
+    input, select {
+      width: calc(100%);
+      margin: 5px 0;
+    }
+
+    label {
+      font-weight: bold;
+    }
+  }
+
+}
+
+@media screen and (min-width: 600px) {
+  .view-trip-modal {
+    inset: 40px
+  }
+
+  .trip-tile {
+    border: 1px solid gray;
+    padding: 25px;
+    width: calc((100vw - 106px)/2);
+  }
+  #image-modal-input, #image-modal-activity {
+    input, select {
+      width: 300px;
+    }
+    label, button, input, select {
+      margin-left: 10px;
+    }
+
+  }
 }
 
 @media screen and (min-width: 1200px) {
@@ -134,7 +178,7 @@ button {
   .trip-tile {
     border: 1px solid gray;
     padding: 25px;
-    width: calc((100vw - 154px)/3);
+    width: calc((100vw - 160px)/3);
   }
 
   .trip-profile-image {
@@ -149,6 +193,25 @@ button {
   }
 }
 
+html, body, #root, .App,.map-container-fullscreen {
+  height: 100%;
+  width: 100%;
+}
+
+#fullScreenMap {
+  position: relative;
+  height: 98%;
+  width: 100%;
+}
+.nfl-team {
+  position: absolute;
+  z-index: 100;
+}
+
+.raiders {
+  filter: brightness(0.2);
+}
+
 .view-trip-image {
   opacity: 1;
 }
@@ -159,7 +222,7 @@ button {
 
 #view-image-modal{
   img {
-    height:100%;
+    width:100%;
     object-fit: contain;
   }
   #close-image-modal-button, #edit-image-modal-button {
@@ -186,14 +249,13 @@ button {
 }
 
 #image-modal-input, #image-modal-activity {
-  margin-top: 20px;
-  input {
-    width: 300px;
-  }
   display: flex;
   justify-content: center;
-  label, button, input {
-    margin-left: 10px;
+  flex-wrap: wrap;
+
+  label {
+    margin: 10px;
+    text-align: center;
   }
 
 }
@@ -266,7 +328,6 @@ button {
 
 .view-trip-modal {
   position: absolute;
-  inset: 40px;
   border: 1px solid rgb(204, 204, 204);
   background: rgb(255, 255, 255);
   overflow: auto;
@@ -304,3 +365,37 @@ button {
   color: #434343;
   background: gold;
 }
+
+.teamLogoMarker{
+  img {
+    height: 50px;
+    width: 50px;
+  }
+
+}
+
+.nfl-teams{
+  display: flex;
+  position: absolute;
+  z-index: 100;
+  .nflTeam.visited {
+    filter: brightness(1.0);
+  }
+  .nflTeam {
+    filter: brightness(0);
+    width: calc((100vw)/16);
+    height: calc(100vw/16);
+    img {
+      width: calc((100vw) / 24);
+      height: calc(100vw / 24);
+    }
+  }
+}
+
+.nfc{
+  bottom: 0;
+}
+
+ .hidden {
+   filter: brightness(0)
+ }

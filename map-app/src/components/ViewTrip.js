@@ -7,8 +7,9 @@ import ReactModal from 'react-modal';
 import AllTripsMap from "./AllTripsMap";
 import {confirmAlert} from 'react-confirm-alert';
 import 'react-confirm-alert/src/react-confirm-alert.css';
+import nflTeams from "./utils/nflTeams";
 
-function ViewTrip({open, tripId, onClose}) {
+function ViewTrip({open, tripId, onClose, onTripUpdate}) {
     // const tripId = window.location.pathname.split("/")[2];
     const [name, setName] = useState('');
     const [location, setLocation] = useState('')
@@ -31,6 +32,9 @@ function ViewTrip({open, tripId, onClose}) {
     const [fetchedImagesForChildTrips, setFetchedImagesForChildTrips] = useState(false)
     const [selectedChildTrip, setSelectedChildTrip] = useState(tripId)
     const [editingTrip, setEditingTrip] = useState(false)
+    const [id, setTripId] = useState(tripId)
+    const [category, setCategory] = useState(null)
+    const [categoryItem, setCategoryItem] = useState(null)
 
     useEffect(() => {
         if (tripId && open) {
@@ -42,6 +46,8 @@ function ViewTrip({open, tripId, onClose}) {
                     setEndDate(response.data.endDate.split(" ")[0])
                     setTripType(response.data.tripType)
                     setParentTripName(response.data.parentTrip)
+                    setCategory(response.data.category)
+                    setCategoryItem(response.data.categoryItem)
                     if (response.data.activities) {
                         setTripActivities(response.data.activities)
                     }
@@ -130,8 +136,12 @@ function ViewTrip({open, tripId, onClose}) {
     const editImage = image => {
         if (openAddActivitiesModal) {
             const imageIds = [...imageIdsForActivity]
-            imageIds.push(image.id)
-            setImageIdsForActivity(imageIds)
+            if (imageIds.includes(image.id)){
+                setImageIdsForActivity(imageIds.filter(imageId => imageId !== image.id))
+            } else {
+                imageIds.push(image.id)
+                setImageIdsForActivity(imageIds)
+            }
         } else {
             setModalImage(image)
             setOpenImageModal(true)
@@ -139,7 +149,7 @@ function ViewTrip({open, tripId, onClose}) {
     }
 
     const deleteTrip = () => {
-        axios.delete(`http://192.168.86.169:8090/trip/${tripId}`, {
+        axios.delete(`http://192.168.86.169:8090/trip/${id}`, {
             headers: {
                 "Access-Control-Allow-Origin": "*",
                 "Access-Control-Allow-Methods": "DELETE, POST, GET, OPTIONS",
@@ -148,18 +158,30 @@ function ViewTrip({open, tripId, onClose}) {
         })
             .then(() => {
                 setImages([]);
-                onClose({id: tripId, location: location})
+                onClose({id: tripId, location: location}, true)
             })
     }
+
+    const getProfilePictureFromImages = () => {
+        if (images?.length) {
+            const profilePicId = images[0].trip.trip_profile_image
+            const profilePicImage = images.find(image => image.id == profilePicId)
+            const selectedImage = profilePicImage ? profilePicImage : images[0]
+            return {id: selectedImage, image: selectedImage.image_location}
+        }
+    }
+
     const submitTrip = () => {
         if (tripId) {
-            axios.put(`http://192.168.86.169:8090/trip/${tripId}`, {
+            axios.put(`http://192.168.86.169:8090/trip/${id ? id : tripId}`, {
                 name: name,
                 location: location,
                 startDate: startDate,
                 endDate: endDate,
                 tripType: tripType,
-                parentTrip: parentTripName
+                parentTrip: parentTripName,
+                category: category,
+                categoryItem: categoryItem
             }, {
                 headers: {
                     "Access-Control-Allow-Origin": "*",
@@ -167,6 +189,10 @@ function ViewTrip({open, tripId, onClose}) {
                     "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Requested-With",
                 }
             }).then(res => {
+                // const updatedTripObj = res.data
+                // updatedTripObj.latestProfilePic = getProfilePictureFromImages(res.data.trip_profile_image)
+                res.data.trip_profile_image = getProfilePictureFromImages()?.image
+                onTripUpdate(res.data);
                 console.log("Request complete! response:", res);
             });
         } else {
@@ -263,7 +289,7 @@ function ViewTrip({open, tripId, onClose}) {
 
     const updateTripActivities = updatedImage => {
         const updatedTripActivities = [...tripActivities]
-        if (!tripActivities.map(activity => activity.id).includes(updatedImage?.activity?.id)) {
+        if (updatedImage?.activity?.id && !tripActivities.map(activity => activity.id).includes(updatedImage?.activity?.id)) {
             updatedTripActivities.push(updatedImage.activity)
             setTripActivities(updatedTripActivities)
             setOpenAddActivitiesModal(true)
@@ -281,7 +307,9 @@ function ViewTrip({open, tripId, onClose}) {
                 if (image.id === updatedImage.id) {
                     image = updatedImage
                 }
-                image.trip.trip_profile_image = updatedImage.id
+                if (updatedImage.isProfilePicture) {
+                    image.trip.trip_profile_image = updatedImage.id
+                }
                 return image;
             })
             setImages(updatedImages)
@@ -345,6 +373,7 @@ function ViewTrip({open, tripId, onClose}) {
                     setTripType(trip.tripType)
                     setParentTripName(trip.parentTrip)
                     setSelectedChildTrip(trip.id)
+                    setTripId(trip.id)
                     if (trip.activities) {
                         setTripActivities([...tripActivities])
                     }
@@ -357,16 +386,22 @@ function ViewTrip({open, tripId, onClose}) {
         if (parentTripSelected) {
             return displayParentTripImages()
         } else if (fetchedImagesForChildTrips && !parentTripSelectedBoolean && childTripId !== tripId) {
-            return displayImages(parentTripImages[childTripId])
+            return displayImages(parentTripImages[childTripId] ? parentTripImages[childTripId] : [])
         } else {
             return displayImages(images)
         }
     }
+
+    const getLatestTripWithProfilePictureWhenClosing = () => {
+        const profilePic = getProfilePictureFromImages()
+        return {id: tripId, profilePicture: profilePic.image, profilePictureId: profilePic.id}
+    }
+
     const locationActivityList = images.map(image => image?.activity?.location).filter(activityLocation => activityLocation)
     const locationList = locationActivityList?.length > 0 ? locationActivityList : [location]
     return (
         <ReactModal isOpen={open} className="view-trip-modal">
-            <div style={{width: "100%"}}>
+            <div >
                 {openAddActivitiesModal && <div id="add-activities-popup">
                     Add activity to other images: {imageIdsForActivity.length} selected <br/>
                     <button onClick={() => {
@@ -402,7 +437,11 @@ function ViewTrip({open, tripId, onClose}) {
                     </button>}
                     <button id="go-home-button" onClick={() => {
                         setImages([]);
-                        onClose()
+                        if (images?.length) {
+                            onClose(getLatestTripWithProfilePictureWhenClosing(), false)
+                        } else{
+                            onClose()
+                        }
                         setParentTripSelected(false)
                         setFetchedImagesForChildTrips(false)
                         setEditingTrip(false)
@@ -464,7 +503,25 @@ function ViewTrip({open, tripId, onClose}) {
                                        type="date"/>
                             </label>
                         </div>
-                        <div></div>
+                        <label htlmFor="category">
+                            Category
+                            <select id="category" value={category}
+                                    onChange={e => setCategory(e.target.value)}>
+                                <option value="">Select a category</option>
+                                <option>NFL</option>
+                            </select>
+                        </label>
+                        {category === "NFL" && (
+                            <label htlmFor="categoryItem">
+                                NFL Team Visited
+                                <select id="categoryItem" value={categoryItem}
+                                        onChange={e => setCategoryItem(e.target.value)}>
+                                    {Object.keys(nflTeams).sort().map(team => {
+                                        return <option>{team}</option>
+                                    })}
+                                </select>
+                            </label>
+                        )}
                         {tripId && (<input
                             type="file"
                             id="file-upload"

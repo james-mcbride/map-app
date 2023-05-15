@@ -76,7 +76,7 @@ public class TripController {
     @RequestMapping(value="/trip/create", method=RequestMethod.POST, produces="application/json")
     public @ResponseBody Trip createTrip(@RequestBody HashMap<String, Object> data, HttpServletRequest httpServletRequest){
         Trip trip = new Trip((String) data.get("location"), (String) data.get("name"), (String) data.get("startDate"),
-                (String) data.get("endDate"), (String) data.get("tripType"), (String) data.get("parentTrip"));
+                (String) data.get("endDate"), (String) data.get("tripType"), (String) data.get("parentTrip"), (String) data.get("category"), (String) data.get("categoryItem"));
         return tripRepository.save(trip);
     }
 
@@ -90,6 +90,8 @@ public class TripController {
         tripFromDb.setEndDate((String) data.get("endDate"));
         tripFromDb.setTripType((String) data.get("tripType"));
         tripFromDb.setParentTrip((String) data.get("parentTrip"));
+        tripFromDb.setCategory((String) data.get("category"));
+        tripFromDb.setCategoryItem((String) data.get("categoryItem"));
         return tripRepository.save(tripFromDb);
     }
 
@@ -121,6 +123,12 @@ public class TripController {
         String nameWithCorrectCharacters = parentTripName.replace("%20", " ");
         System.out.println(nameWithCorrectCharacters);
         return tripRepository.findTripsByParentTrip(nameWithCorrectCharacters);
+    }
+
+    @CrossOrigin
+    @RequestMapping(value="/category/{name}", method=RequestMethod.GET, produces="application/json")
+    public @ResponseBody List<Trip> retrieveTripsForCategoryName(@PathVariable String name) {
+        return tripRepository.findTripsByCategory(name);
     }
 
 }

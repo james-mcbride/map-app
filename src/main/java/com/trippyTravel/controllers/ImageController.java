@@ -66,6 +66,8 @@ public class ImageController {
                 String activityIdString = (String) data.get("activityId");
                 Long activityId = Long.parseLong(activityIdString);
                 Activity activity = activityRepository.getOne(activityId);
+                activity.setName((String) data.get("activityName"));
+                activity.setLocation((String) data.get("activityLocation"));
                 image.setActivity(activity);
             } else {
                 System.out.println("activity location: " + data.get("activity.location"));
