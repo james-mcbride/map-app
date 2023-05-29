@@ -91,9 +91,28 @@ function NflMapContainer() {
         )
     })
 
+    const getNumTeamsVisited = () => {
+        const teamsVisited = trips.map(trip => trip.categoryItem)
+        const teamVisitedMap = {}
+        let count = 0
+        teamsVisited.forEach(team => {
+            if (!teamVisitedMap[team]) {
+                teamVisitedMap[team] = team
+                count++
+            }
+        })
+        return count
+    }
 
     return (
         <div style={{width: "100%", height: "100%", position: "relative"}}>
+            <div className="nfl-logo">
+                <img src={nflLogo}/>
+                <div className="teams-visited-summary">
+                    <div style={{color: "#013369"}}>{`${getNumTeamsVisited()} teams visited`}</div>
+                    <div style={{color: "#D50A0A"}}> {`${32 - getNumTeamsVisited()} Teams Remaining`}</div>
+                </div>
+            </div>
             <div className="afc-logo">
                 <img src={afcLogo} />
             </div>

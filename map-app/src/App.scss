@@ -424,6 +424,24 @@ html, body, #root, .App,.map-container-fullscreen {
   }
 }
 
+.nfl-logo {
+  right: calc(100vw / 5 - (100vh) / 24);
+  top: calc(100vh / 7);
+  position: absolute;
+  z-index:1000;
+  img {
+    width: calc((100vh) / 12);
+    height: calc(100vh / 12);
+  }
+  font-family: NFL;
+  text-align: center;
+  background-color: rgba(224, 224, 224, 0.9);
+  padding: 20px;
+  border-radius: 10px;
+  display: flex;
+  border: 3px solid #D50A0A;
+}
+
 .nfc.east, .nfc.south {
   right: 0;
 }
@@ -500,4 +518,10 @@ html, body, #root, .App,.map-container-fullscreen {
     font-style: italic;
     font-size: small;
   }
+}
+
+.teams-visited-summary {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
 }
