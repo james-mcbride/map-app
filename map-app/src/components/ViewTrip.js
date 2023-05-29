@@ -35,6 +35,10 @@ function ViewTrip({open, tripId, onClose, onTripUpdate}) {
     const [id, setTripId] = useState(tripId)
     const [category, setCategory] = useState(null)
     const [categoryItem, setCategoryItem] = useState(null)
+    const [categoryItemDetail1, setCategoryItemDetail1] = useState(null)
+    const [categoryItemDetail2, setCategoryItemDetail2] = useState(null)
+    const [categoryItemDetail3, setCategoryItemDetail3] = useState(null)
+
 
     useEffect(() => {
         if (tripId && open) {
@@ -48,6 +52,10 @@ function ViewTrip({open, tripId, onClose, onTripUpdate}) {
                     setParentTripName(response.data.parentTrip)
                     setCategory(response.data.category)
                     setCategoryItem(response.data.categoryItem)
+                    setCategoryItemDetail1(response.data.categoryItemDetail1 ? response.data.categoryItemDetail1 : '')
+                    setCategoryItemDetail2(response.data.categoryItemDetail2  ? response.data.categoryItemDetail2 : '')
+                    setCategoryItemDetail3(response.data.categoryItemDetail3 ? response.data.categoryItemDetail3 : '')
+
                     if (response.data.activities) {
                         setTripActivities(response.data.activities)
                     }
@@ -181,7 +189,10 @@ function ViewTrip({open, tripId, onClose, onTripUpdate}) {
                 tripType: tripType,
                 parentTrip: parentTripName,
                 category: category,
-                categoryItem: categoryItem
+                categoryItem: categoryItem,
+                categoryItemDetail1: categoryItemDetail1,
+                categoryItemDetail2: categoryItemDetail2,
+                categoryItemDetail3: categoryItemDetail3
             }, {
                 headers: {
                     "Access-Control-Allow-Origin": "*",
@@ -520,6 +531,30 @@ function ViewTrip({open, tripId, onClose, onTripUpdate}) {
                                         return <option>{team}</option>
                                     })}
                                 </select>
+                            </label>
+                        )}
+                        {category === "NFL" && (
+                            <label htlmFor="categoryItemDetail1">
+                                Away Team
+                                <select id="categoryItemDetail1" value={categoryItemDetail1}
+                                        onChange={e => setCategoryItemDetail1(e.target.value)}>
+                                    {Object.keys(nflTeams).sort().map(team => {
+                                        return <option>{team}</option>
+                                    })}
+                                </select>
+                            </label>
+                        )}
+                        {category === "NFL" && (
+                            <label htlmFor="categoryItemDetail2">
+                                Home Team Score
+                                <input id="categoryItemDetail2" value={categoryItemDetail2} onChange={e => setCategoryItemDetail2(e.target.value)}/>
+                            </label>
+                        )}
+                        {category === "NFL" && (
+                            <label htlmFor="categoryItemDetail3">
+                                Away Team Score
+                                <input id="categoryItemDetail3" value={categoryItemDetail3} onChange={e => setCategoryItemDetail3(e.target.value)}/>
+
                             </label>
                         )}
                         {tripId && (<input

@@ -200,7 +200,7 @@ html, body, #root, .App,.map-container-fullscreen {
 
 #fullScreenMap {
   position: relative;
-  height: 98%;
+  height: 100%;
   width: 100%;
 }
 .nfl-team {
@@ -375,27 +375,129 @@ html, body, #root, .App,.map-container-fullscreen {
 }
 
 .nfl-teams{
+  border-radius: 10px;
   display: flex;
+  flex-direction: column;
   position: absolute;
   z-index: 100;
+  background-color: rgba(224, 224, 224, 0.5);
   .nflTeam.visited {
     filter: brightness(1.0);
   }
   .nflTeam {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    //border: 1px solid black;
     filter: brightness(0);
-    width: calc((100vw)/16);
-    height: calc(100vw/16);
+    width: calc((100vh)/9);
+    height: calc(100vh/9);
     img {
-      width: calc((100vw) / 24);
-      height: calc(100vw / 24);
+      width: calc((100vh) / 18);
+      height: calc(100vh / 18);
+    }
+    .score-logo {
+      width: calc((100vh) / 36);
+      height: calc(100vh / 36);
     }
   }
 }
-
-.nfc{
-  bottom: 0;
+.afc-logo {
+  top: calc(100vh / 2 - (100vh) / 16 );
+  left: calc(100vh / 10 + 25px - (100vh /18));
+  position: absolute;
+  z-index:1000;
+  img {
+    width: calc((100vh) / 9);
+    height: calc(100vh / 9);
+  }
 }
+
+.nfc-logo {
+  top: calc(100vh / 2 - (100vh) / 24);
+  right: calc(100vh / 10 + 25px - (100vh /30));
+  position: absolute;
+  z-index:1000;
+  img {
+    width: calc((100vh) / 15);
+    height: calc(100vh / 15);
+  }
+}
+
+.nfc.east, .nfc.south {
+  right: 0;
+}
+
+.afc.north, .afc.west {
+  left: 0
+}
+
+.afc.east, .afc.south {
+  left: calc(100vh / 10 + 50px)
+}
+
+.nfc.north, .nfc.west {
+  right: calc(100vh / 10 + 50px)
+}
+
+.east, .north {
+  top: 0;
+}
+.south, .west {
+  top: calc(((100vh)/2) + 25px )
+}
+
 
  .hidden {
    filter: brightness(0)
  }
+
+ .division {
+   margin:10px;
+   font-family: NFL;
+   text-align: center;
+   text-shadow: #FFF 0px 0px 1px;
+ }
+
+ .division.afc-division {
+   color: #D50A0A;
+ }
+.division.nfc-division {
+  color: #355c90;
+}
+
+
+ @font-face {
+   font-family: "NFL";
+   src: url("./components/fonts/Freshman.ttf") format('truetype')
+ }
+
+.game-score {
+  display: flex;
+  width: 100%;
+  justify-content: space-evenly;
+  font-family: NFL;
+  text-align: center;
+  .winner {
+    color: green;
+  }
+  .loser {
+    color: red;
+  }
+}
+
+.team-score {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.game-info {
+  width: 100%;
+  .game-date {
+    text-align: center;
+    font-style: italic;
+    font-size: small;
+  }
+}

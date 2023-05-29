@@ -76,7 +76,9 @@ public class TripController {
     @RequestMapping(value="/trip/create", method=RequestMethod.POST, produces="application/json")
     public @ResponseBody Trip createTrip(@RequestBody HashMap<String, Object> data, HttpServletRequest httpServletRequest){
         Trip trip = new Trip((String) data.get("location"), (String) data.get("name"), (String) data.get("startDate"),
-                (String) data.get("endDate"), (String) data.get("tripType"), (String) data.get("parentTrip"), (String) data.get("category"), (String) data.get("categoryItem"));
+                (String) data.get("endDate"), (String) data.get("tripType"), (String) data.get("parentTrip"),
+                (String) data.get("category"), (String) data.get("categoryItem"), (String) data.get("categoryItemDetail1"),
+                (String) data.get("categoryItemDetail2"), (String) data.get("categoryItemDetail3"));
         return tripRepository.save(trip);
     }
 
@@ -92,6 +94,9 @@ public class TripController {
         tripFromDb.setParentTrip((String) data.get("parentTrip"));
         tripFromDb.setCategory((String) data.get("category"));
         tripFromDb.setCategoryItem((String) data.get("categoryItem"));
+        tripFromDb.setCategoryItemDetail1((String) data.get("categoryItemDetail1"));
+        tripFromDb.setCategoryItemDetail2((String) data.get("categoryItemDetail2"));
+        tripFromDb.setCategoryItemDetail3((String) data.get("categoryItemDetail3"));
         return tripRepository.save(tripFromDb);
     }
 

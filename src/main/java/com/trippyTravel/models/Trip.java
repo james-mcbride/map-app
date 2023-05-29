@@ -84,13 +84,46 @@ public class Trip {
     @Column(name = "categoryItem")
     private String categoryItem;
 
+    public String getCategoryItemDetail1() {
+        return categoryItemDetail1;
+    }
+
+    public void setCategoryItemDetail1(String categoryItemDetail1) {
+        this.categoryItemDetail1 = categoryItemDetail1;
+    }
+
+    public String getCategoryItemDetail2() {
+        return categoryItemDetail2;
+    }
+
+    public void setCategoryItemDetail2(String categoryItemDetail2) {
+        this.categoryItemDetail2 = categoryItemDetail2;
+    }
+
+    public String getCategoryItemDetail3() {
+        return categoryItemDetail3;
+    }
+
+    public void setCategoryItemDetail3(String categoryItemDetail3) {
+        this.categoryItemDetail3 = categoryItemDetail3;
+    }
+
+    @Column(name = "categoryItemDetail1")
+    private String categoryItemDetail1;
+
+    @Column(name = "categoryItemDetail2")
+    private String categoryItemDetail2;
+
+    @Column(name = "categoryItemDetail3")
+    private String categoryItemDetail3;
+
     public Trip() {
     }
 
     public Trip(Long id) {
         this.id = id;
     }
-    public Trip(String location, String name, String startDate, String endDate, String tripType, String parentTrip, String category, String categoryItem) {
+    public Trip(String location, String name, String startDate, String endDate, String tripType, String parentTrip, String category, String categoryItem, String categoryItemDetail1, String categoryItemDetail2, String categoryItemDetail3) {
         this.location = location;
         this.name = name;
         this.startDate = startDate;
@@ -99,6 +132,9 @@ public class Trip {
         this.parentTrip = parentTrip;
         this.category = category;
         this.categoryItem = categoryItem;
+        this.categoryItemDetail1 = categoryItemDetail1;
+        this.categoryItemDetail2 = categoryItemDetail2;
+        this.categoryItemDetail3 = categoryItemDetail3;
     }
 
     public Trip(String location, String name, String description, String trip_profile_image, String startDate, String endDate, List<User> users, List<Image> images, String tripType, String parentTrip) {
