@@ -132,8 +132,23 @@ public class TripController {
 
     @CrossOrigin
     @RequestMapping(value="/category/{name}", method=RequestMethod.GET, produces="application/json")
-    public @ResponseBody List<Trip> retrieveTripsForCategoryName(@PathVariable String name) {
-        return tripRepository.findTripsByCategory(name);
+    public @ResponseBody List<Trip> retrieveTripsForCategoryName(@PathVariable String name) throws IOException {
+        List<Trip> trips = tripRepository.findTripsByCategory(name);
+        for (int i = 0; i < trips.size(); i++) {
+            Trip trip = trips.get(i);
+            String profileImageId = null;
+            if (trip.getTrip_profile_image() != null) {
+                profileImageId = trip.getTrip_profile_image();
+            } else {
+                if (trip.getImages().size() > 0) {
+                    profileImageId = Long.toString(trip.getImages().get(0).getId());
+                }
+            }
+            if (profileImageId != null) {
+                trip.setTrip_profile_image(imageService.getEncodedImageFileById(profileImageId));
+            }
+        }
+        return trips;
     }
 
 }

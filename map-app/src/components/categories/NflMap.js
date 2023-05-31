@@ -18,7 +18,7 @@ const kansas = {
     ]
 }
 
-function NflMap({locations}) {
+function NflMap({locations, setOpenTeamModal}) {
     mapboxgl.accessToken = accessToken;
     const mapContainer = useRef(null);
     const map = useRef(null);
@@ -61,7 +61,7 @@ function NflMap({locations}) {
             //             })
             //             .addTo(map.current);
             // })
-            map.current.on('load', () => {
+            // map.current.on('load', () => {
                 // map.current.addSource('states', {
                 //     'type': 'geojson',
                 //     'data': 'https://docs.mapbox.com/mapbox-gl-js/assets/us_states.geojson'
@@ -70,11 +70,11 @@ function NflMap({locations}) {
                     const stateTeam = Object.values(nflTeams).find(team => team?.territory?.includes(stateInfo.properties.STATE_NAME))
                     console.log(stateTeam)
                     let addTeamColorsToState = false
-                    if (stateTeam){
+                    if (stateTeam) {
                         console.log("logging locations")
                         console.log(locations)
                         locations.forEach(location => {
-                            if(stateTeam.Team.toLowerCase().includes(location.categoryItem.toLowerCase())){
+                            if (stateTeam.Team.toLowerCase().includes(location.categoryItem.toLowerCase())) {
                                 console.log("adding team colors to state for: " + stateTeam.Team)
                                 addTeamColorsToState = true
                             }
@@ -103,7 +103,7 @@ function NflMap({locations}) {
                                 'case',
                                 ['boolean', ['feature-state', 'hover'], false],
                                 1,
-                                0.95
+                                0.8
                             ]
                         }
                     });
@@ -118,12 +118,15 @@ function NflMap({locations}) {
                             'line-width': 1
                         }
                     });
+                    map.current.on('click', `${stateInfo.properties.STATE_NAME}state-fills`, (e) => {
+                        if (stateTeam) {
+                            setOpenTeamModal(stateTeam.Team);
+                        }
+                    });
                 })
 
 
-
-
-            });
+            // });
         }
     }, [locations, map.current])
 

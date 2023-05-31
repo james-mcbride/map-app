@@ -339,6 +339,19 @@ html, body, #root, .App,.map-container-fullscreen {
   right: 10px;
 }
 
+.view-team-modal {
+  position: absolute;
+  border: 1px solid rgb(204, 204, 204);
+  background: rgb(255, 255, 255);
+  overflow: auto;
+  border-radius: 4px;
+  outline: none;
+  padding: 20px;
+  left: 10vw;
+  top: 10vw;
+  right: 60vw;
+}
+
 .ReactModal__Overlay {
   z-index: 6;
 }
@@ -374,13 +387,22 @@ html, body, #root, .App,.map-container-fullscreen {
 
 }
 
+.nfl-teams.afc {
+  background-color: rgba(213, 10, 10, 0.5);
+  border: 1px solid #355c90;
+}
+
+.nfl-teams.nfc {
+  background-color: rgba(53, 92, 144, 0.5);
+  border: 1px solid #d50a0a;
+}
+
 .nfl-teams{
   border-radius: 10px;
   display: flex;
   flex-direction: column;
   position: absolute;
   z-index: 100;
-  background-color: rgba(224, 224, 224, 0.5);
   .nflTeam.visited {
     filter: brightness(1.0);
   }
@@ -403,30 +425,30 @@ html, body, #root, .App,.map-container-fullscreen {
   }
 }
 .afc-logo {
-  top: calc(100vh / 2 - (100vh) / 16 );
-  left: calc(100vh / 10 + 25px - (100vh /18));
+  left: calc(100vw / 2 - (100vh) / 16 );
+  top: 0;
   position: absolute;
-  z-index:1000;
+  z-index:1001;
   img {
-    width: calc((100vh) / 9);
-    height: calc(100vh / 9);
+    width: calc((100vh) / 8);
+    height: calc(100vh / 8);
   }
 }
 
 .nfc-logo {
-  top: calc(100vh / 2 - (100vh) / 24);
-  right: calc(100vh / 10 + 25px - (100vh /30));
+  left: calc(100vw / 2 - (100vh) / 24);
+  bottom: 50px;
   position: absolute;
   z-index:1000;
   img {
-    width: calc((100vh) / 15);
-    height: calc(100vh / 15);
+    width: calc((100vh) / 12);
+    height: calc(100vh / 12);
   }
 }
 
 .nfl-logo {
-  right: calc(100vw / 5 - (100vh) / 24);
-  top: calc(100vh / 7);
+  right: calc(100vw / 10);
+  bottom: calc(100vh / 4);
   position: absolute;
   z-index:1000;
   img {
@@ -442,27 +464,25 @@ html, body, #root, .App,.map-container-fullscreen {
   border: 3px solid #D50A0A;
 }
 
-.nfc.east, .nfc.south {
+.west {
+  left: 0;
+}
+.east {
   right: 0;
 }
-
-.afc.north, .afc.west {
-  left: 0
+.north {
+  left: calc(100vw/4);
+}
+.south {
+  right: calc(100vw/4)
 }
 
-.afc.east, .afc.south {
-  left: calc(100vh / 10 + 50px)
+.afc {
+  top: 5px;
 }
 
-.nfc.north, .nfc.west {
-  right: calc(100vh / 10 + 50px)
-}
-
-.east, .north {
-  top: 0;
-}
-.south, .west {
-  top: calc(((100vh)/2) + 25px )
+.nfc {
+  bottom: 5px;
 }
 
 
@@ -471,10 +491,10 @@ html, body, #root, .App,.map-container-fullscreen {
  }
 
  .division {
-   margin:10px;
+   margin:2px;
    font-family: NFL;
    text-align: center;
-   text-shadow: #FFF 0px 0px 1px;
+   text-shadow: #FFF 0px 0px 5px;
  }
 
  .division.afc-division {
@@ -497,10 +517,10 @@ html, body, #root, .App,.map-container-fullscreen {
   font-family: NFL;
   text-align: center;
   .winner {
-    color: green;
+    color: #37d437;
   }
   .loser {
-    color: red;
+    color: #ff9800;
   }
 }
 
@@ -524,4 +544,8 @@ html, body, #root, .App,.map-container-fullscreen {
   display: flex;
   flex-direction: column;
   justify-content: space-evenly;
+}
+
+.team-divisions-div {
+  display:flex;
 }
