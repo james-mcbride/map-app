@@ -42,7 +42,8 @@ const nflTeams = {
         "Stadium": "MetLife Stadium",
         "Conference": "NFC",
         logo: giantsLogo,
-        division: "east"
+        division: "east",
+        acronym: "NYG"
     },
     "Jets": {
         "League": "NFL",
@@ -52,7 +53,8 @@ const nflTeams = {
         "Stadium": "MetLife Stadium",
         "Conference": "AFC",
         logo: jetsLogo,
-        division: "east"
+        division: "east",
+        acronym: "NYJ"
     },
     "Packers": {
         "League": "NFL",
@@ -62,7 +64,8 @@ const nflTeams = {
         "Stadium": "Lambeau Field",
         "Conference": "NFC",
         logo: packersLogo,
-        division: "north"
+        division: "north",
+        acronym: "GB"
     },
 
     "Cowboys": {
@@ -76,7 +79,8 @@ const nflTeams = {
         division: "east",
         territory: ["Texas", "Oklahoma"],
         primaryColor:"#869397",
-        secondaryColor: "#041E42"
+        secondaryColor: "#041E42",
+        acronym: "DAL"
     },
     "Commanders": {
         "League": "NFL",
@@ -86,7 +90,8 @@ const nflTeams = {
         "Stadium": "FedEx Field",
         "Conference": "NFC",
         logo: redskinsLogo,
-        division: "east"
+        division: "east",
+        acronym: "WAS"
     },
     "Chiefs": {
         "League": "NFL",
@@ -99,7 +104,8 @@ const nflTeams = {
         division: "west",
         territory: ["Kansas", "Missouri"],
         primaryColor: "#E31837",
-        secondaryColor: "#FFB81C"
+        secondaryColor: "#FFB81C",
+        acronym: "KC"
     },
     "Broncos": {
         "League": "NFL",
@@ -109,7 +115,8 @@ const nflTeams = {
         "Stadium": "Sports Authority Field at Mile High",
         "Conference": "AFC",
         logo: broncosLogo,
-        division: "west"
+        division: "west",
+        acronym: "DEN"
     },
     "Dolphins": {
         "League": "NFL",
@@ -119,7 +126,8 @@ const nflTeams = {
         "Stadium": "Hard Rock Stadium",
         "Conference": "AFC",
         logo: dolphinsLogo,
-        division: "east"
+        division: "east",
+        acronym: "MIA"
     },
     "Panthers": {
         "League": "NFL",
@@ -129,7 +137,8 @@ const nflTeams = {
         "Stadium": "Bank of America Stadium",
         "Conference": "NFC",
         logo: panthersLogo,
-        division: "south"
+        division: "south",
+        acronym: "CAR"
     },
     "Saints": {
         "League": "NFL",
@@ -142,7 +151,8 @@ const nflTeams = {
         division: "south",
         territory: ["Louisiana", "Mississippi", "Arkansas"],
         primaryColor: "#D3BC8D",
-        secondaryColor: "#101820"
+        secondaryColor: "#101820",
+        acronym: "NO"
     },
     "Browns": {
         "League": "NFL",
@@ -155,7 +165,8 @@ const nflTeams = {
         division: "north",
         territory: ["Northeast Ohio"],
         primaryColor: "#FF3C00",
-        secondaryColor: "#311D00"
+        secondaryColor: "#311D00",
+        acronym: "CLE"
     },
     "Bills": {
         "League": "NFL",
@@ -165,7 +176,8 @@ const nflTeams = {
         "Stadium": "Ralph Wilson Stadium",
         "Conference": "AFC",
         logo: billsLogo,
-        division: "east"
+        division: "east",
+        acronym: "BUF"
     },
     "Titans": {
         "League": "NFL",
@@ -175,7 +187,8 @@ const nflTeams = {
         "Stadium": "Nissan Stadium",
         "Conference": "AFC",
         logo: titansLogo,
-        division: "south"
+        division: "south",
+        acronym: "TEN"
     },
     "Patriots": {
         "League": "NFL",
@@ -185,7 +198,8 @@ const nflTeams = {
         "Stadium": "Gillette Stadium",
         "Conference": "AFC",
         logo: patriotsLogo,
-        division: "east"
+        division: "east",
+        acronym: "NE"
     },
     "Eagles": {
         "League": "NFL",
@@ -195,7 +209,8 @@ const nflTeams = {
         "Stadium": "Lincoln Financial Field",
         "Conference": "NFC",
         logo: eaglesLogo,
-        division: "east"
+        division: "east",
+        acronym: "PHI"
     },
     "49ers": {
         "League": "NFL",
@@ -205,7 +220,8 @@ const nflTeams = {
         "Stadium": "Levis Stadium",
         "Conference": "NFC",
         logo: fortyNinersLogo,
-        division: "west"
+        division: "west",
+        acronym: "SF"
     },
     "Jaguars": {
         "League": "NFL",
@@ -215,7 +231,10 @@ const nflTeams = {
         "Stadium": "EverBank Field",
         "Conference": "AFC",
         logo: jaguarsLogo,
-        division: "south"
+        division: "south",
+        acronym: "JAX",
+        primaryColor: "#00677F",
+        secondaryColor: "#D7A22A"
     },
     "Seahawks": {
         "League": "NFL",
@@ -225,7 +244,8 @@ const nflTeams = {
         "Stadium": "CenturyLink Field",
         "Conference": "NFC",
         logo: seahawksLogo,
-        division: "west"
+        division: "west",
+        acronym: "SEA"
     },
     "Buccaneers": {
         "League": "NFL",
@@ -235,7 +255,8 @@ const nflTeams = {
         "Stadium": "Raymond James Stadium",
         "Conference": "NFC",
         logo: buccaneersLogo,
-        division: "south"
+        division: "south",
+        acronym: "TB"
     },
     "Bengals": {
         "League": "NFL",
@@ -245,7 +266,8 @@ const nflTeams = {
         "Stadium": "Paul Brown Stadium",
         "Conference": "AFC",
         logo: bengalsLogo,
-        division: "north"
+        division: "north",
+        acronym: "CIN"
     },
     "Steelers": {
         "League": "NFL",
@@ -258,7 +280,8 @@ const nflTeams = {
         division: "north",
         territory: ["Pennsylvania", "West Virginia", "West Maryland"],
         primaryColor: "#FFB612",
-        secondaryColor: "#101820"
+        secondaryColor: "#101820",
+        acronym: "PIT"
     },
     "Lions": {
         "League": "NFL",
@@ -271,7 +294,8 @@ const nflTeams = {
         division: "north",
         territory: ["Michigan"],
         primaryColor: "#B0B7BC",
-        secondaryColor: "#0076B6"
+        secondaryColor: "#0076B6",
+        acronym: "DET"
     },
     "Cardinals": {
         "League": "NFL",
@@ -281,7 +305,8 @@ const nflTeams = {
         "Stadium": "University of Phoenix Stadium",
         "Conference": "NFC",
         logo: cardinalsLogo,
-        division: "west"
+        division: "west",
+        acronym: "ARI"
     },
     "Colts": {
         "League": "NFL",
@@ -291,7 +316,8 @@ const nflTeams = {
         "Stadium": "Lucas Oil Stadium",
         "Conference": "AFC",
         logo: coltsLogo,
-        division: "south"
+        division: "south",
+        acronym: "IND"
     },
     "Raiders": {
         "League": "NFL",
@@ -301,7 +327,8 @@ const nflTeams = {
         "Stadium": "Oakland Alameda Coliseum",
         "Conference": "AFC",
         logo: raidersLogo,
-        division: "west"
+        division: "west",
+        acronym: "OAK"
     },
     "Falcons": {
         "League": "NFL",
@@ -311,7 +338,8 @@ const nflTeams = {
         "Stadium": "Mercedes-Benz Stadium",
         "Conference": "NFC",
         logo: falconsLogo,
-        division: "south"
+        division: "south",
+        acronym: "ATL"
     },
     "Texans": {
         "League": "NFL",
@@ -321,7 +349,8 @@ const nflTeams = {
         "Stadium": "NRG Stadium",
         "Conference": "AFC",
         logo: texansLogo,
-        division: "south"
+        division: "south",
+        acronym: "HOU"
     },
     "Ravens": {
         "League": "NFL",
@@ -331,7 +360,8 @@ const nflTeams = {
         "Stadium": "M&T Bank Stadium",
         "Conference": "AFC",
         logo: ravensLogo,
-        division: "north"
+        division: "north",
+        acronym: "BAL"
     },
     "Chargers": {
         "League": "NFL",
@@ -341,7 +371,8 @@ const nflTeams = {
         "Stadium": "StubHub Center",
         "Conference": "AFC",
         logo: chargersLogo,
-        division: "west"
+        division: "west",
+        acronym: "LAC"
     },
     "Rams": {
         "Stadium": "Los Angeles Memorial Coliseum",
@@ -351,7 +382,8 @@ const nflTeams = {
         "League": "NFL",
         "Conference": "NFC",
         logo: ramsLogo,
-        division: "west"
+        division: "west",
+        acronym: "LAR"
     },
     "Bears": {
         "League": "NFL",
@@ -361,7 +393,8 @@ const nflTeams = {
         "Stadium": "Soldier Field",
         "Conference": "NFC",
         logo: bearsLogo,
-        division: "north"
+        division: "north",
+        acronym: "CHI"
     },
     "Vikings": {
         "League": "NFL",
@@ -371,7 +404,8 @@ const nflTeams = {
         "Stadium": "U.S. Bank Stadium",
         "Conference": "NFC",
         logo: vikingsLogo,
-        division: "north"
+        division: "north",
+        acronym: "MIN"
     },
 }
 export default nflTeams;

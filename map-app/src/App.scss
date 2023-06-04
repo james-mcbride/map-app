@@ -549,3 +549,63 @@ html, body, #root, .App,.map-container-fullscreen {
 .team-divisions-div {
   display:flex;
 }
+
+.individual-score-logo {
+  display: flex;
+  align-items: center;
+  color: white;
+  font-weight: bold;
+  font-size: xx-large;
+  flex-grow: 3;
+  border: 1px solid white;
+  height: 4vw;
+  padding-left: .75vw;
+}
+
+.score-logo-modal {
+  width: 3vw;
+  margin-right: .75vw;
+}
+
+.team-score-modal {
+  display:flex;
+}
+
+.individual-score {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  background: black;
+  font-weight: bold;
+  font-size: xx-large;
+  border: 1px solid white;
+  width: 3vw;
+}
+
+.trip-profile-image-modal {
+  img {
+    height: 10vw;
+    width: 10vw;
+    object-fit: cover;
+    border-radius: 5%;
+  }
+}
+
+.game-score-modal {
+  width: 100%;
+}
+
+.game-date-modal{
+  background: black;
+  color: white;
+  font-size: large;
+  text-align: center;
+  font-weight: bold;
+}
+
+.trip-game-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+}
