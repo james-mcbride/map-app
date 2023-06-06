@@ -3,7 +3,7 @@ import ReactModal from 'react-modal';
 import defaultImage from "./images/airplane.png";
 import nflTeams from "./utils/nflTeams";
 
-function TeamModal({team, trips, isOpen}) {
+function TeamModal({team, trips, isOpen, closeModal}) {
     const teamTrips = trips ? trips : []
 
     const gameDate = date => {
@@ -16,11 +16,13 @@ function TeamModal({team, trips, isOpen}) {
     }
 
     const getTeamInfo = selectedTeam => {
-        return Object.values(nflTeams).find(team => team.Team.toLowerCase().includes(selectedTeam.toLowerCase()))
+        if (selectedTeam) {
+            return Object.values(nflTeams).find(team => team.Team.toLowerCase().includes(selectedTeam.toLowerCase()))
+        }
     }
 
     const tripList = teamTrips.map(trip => (
-        <div>
+        <div className="trip-game-info-container" style={{background: getTeamInfo(trips?.length > 0 ? trips[0].categoryItem : null)?.secondaryColor}}>
         <div className="trip-game-info">
             <div className="trip-profile-image-modal">
                 <img src={trip?.trip_profile_image ? `data:image/jpeg;base64,${trip?.trip_profile_image}` : defaultImage}/>
@@ -50,8 +52,16 @@ function TeamModal({team, trips, isOpen}) {
         </div>
     ))
     return (
-        <ReactModal isOpen={isOpen} className="view-team-modal">
-            {tripList}
+        <ReactModal isOpen={isOpen} className="view-team-modal" style={{background: `7F${getTeamInfo(trips?.length > 0 ? trips[0].categoryItem : null)?.primaryColor}`, border: `1px solid ${trips?.length > 0 ? getTeamInfo(trips[0].categoryItem)?.secondaryColor : null}`}}>
+            <div className="view-team-modal-div" style={{background: getTeamInfo(trips?.length > 0 ? trips[0].categoryItem : null)?.primaryColor, border: `5px solid ${trips?.length > 0 ? getTeamInfo(trips[0].categoryItem)?.secondaryColor : null}`, color: getTeamInfo(trips?.length > 0 ? trips[0].categoryItem : null)?.secondaryColor}}>
+                <button
+                    className="team-modal-button"
+                    onClick={() => closeModal()}
+                    style={{background: getTeamInfo(trips?.length > 0 ? trips[0].categoryItem : null)?.secondaryColor, color: getTeamInfo(trips?.length > 0 ? trips[0].categoryItem : null)?.primaryColor}}
+                >close</button>
+                <h1 className="team-modal-header">{getTeamInfo(trips?.length > 0 ? trips[0].categoryItem : null)?.Team}</h1>
+                {tripList}
+            </div>
         </ReactModal>
     )
 }

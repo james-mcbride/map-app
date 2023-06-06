@@ -346,10 +346,19 @@ html, body, #root, .App,.map-container-fullscreen {
   overflow: auto;
   border-radius: 4px;
   outline: none;
-  padding: 20px;
   left: 10vw;
   top: 10vw;
   right: 60vw;
+}
+
+.view-team-modal-div {
+  padding: 20px;
+  text-align: center;
+  position: relative;
+}
+
+.team-modal-header {
+  font-family: NFL;
 }
 
 .ReactModal__Overlay {
@@ -403,6 +412,7 @@ html, body, #root, .App,.map-container-fullscreen {
   flex-direction: column;
   position: absolute;
   z-index: 100;
+  padding-bottom: 8px;
   .nflTeam.visited {
     filter: brightness(1.0);
   }
@@ -584,6 +594,7 @@ html, body, #root, .App,.map-container-fullscreen {
 }
 
 .trip-profile-image-modal {
+  margin: 5px 10px;
   img {
     height: 10vw;
     width: 10vw;
@@ -608,4 +619,15 @@ html, body, #root, .App,.map-container-fullscreen {
   display: flex;
   align-items: center;
   justify-content: space-evenly;
+}
+
+.trip-game-info-container {
+  margin: 10px 0;
+  padding: 5px;
+  border-radius: 5px;
+}
+
+.team-modal-button {
+  right: 5px;
+  position: absolute;
 }

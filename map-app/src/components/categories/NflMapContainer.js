@@ -175,7 +175,7 @@ function NflMapContainer() {
                 setSelectedTeam(team)
                 setTeamModalOpen(true)
             }}/>
-            <TeamModal trips={trips.filter(trip => selectedTeam?.toLowerCase()?.includes(trip.categoryItem.toLowerCase()))} isOpen={teamModalOpen}/>
+            <TeamModal closeModal={() => setTeamModalOpen(false)} trips={trips.filter(trip => selectedTeam?.toLowerCase()?.includes(trip.categoryItem.toLowerCase()))} isOpen={teamModalOpen}/>
         </div>
     )
 }
