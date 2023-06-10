@@ -117,10 +117,15 @@ public class ImageController {
     public @ResponseBody
     Image saveImages(@PathVariable long id, @RequestBody HashMap<String, Object> data, HttpServletRequest httpServletRequest) throws IOException {
         Trip trip= tripRepository.getOne(id);
-        Image image = imagesRepository.save(new Image(trip));
+        String fileType = (String) data.get("fileType");
+        Image image = imagesRepository.save(new Image(trip, fileType));
         image.setDescription((String) data.get("description"));
         byte[] decodedImage = Base64.decodeBase64((String) data.get("image"));
-        Path destinationFIle = Paths.get("/Users/jimmiemcbride/Pictures/mapapp", String.format("%s.jpeg", Long.toString(image.getId())));
+        String destinationFileType = "%s.jpeg";
+        if (fileType.equals("video/quicktime")){
+            destinationFileType = "%s.mp4";
+        }
+        Path destinationFIle = Paths.get("/Users/jimmiemcbride/Pictures/mapapp", String.format(destinationFileType, Long.toString(image.getId())));
         Files.write(destinationFIle, decodedImage);
         return image;
     }

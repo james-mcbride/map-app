@@ -19,12 +19,16 @@ public class ImageService {
     }
     public String getEncodedImageFile(Image image) throws IOException {
         String imageId = Long.toString(image.getId());
-        return getEncodedImageFileById(imageId);
+        String fileType = "%s.jpeg";
+        if (image.getFileType().equals("video/quicktime")) {
+            fileType = "%s.mp4";
+        }
+        return getEncodedImageFileById(imageId, fileType);
     }
 
-    public String getEncodedImageFileById(String id) throws IOException {
-        Path destinationFIle = Paths.get("/Users/jimmiemcbride/Pictures/mapapp", String.format("%s.jpeg", id));
-        System.out.println("getting image from file with id: " + id);
+    public String getEncodedImageFileById(String id, String fileType) throws IOException {
+        Path destinationFIle = Paths.get("/Users/jimmiemcbride/Pictures/mapapp", String.format(fileType, id));
+        System.out.println("getting image from file with id: " + id + " and fileType: " + fileType);
         byte[] imageBytes = Files.readAllBytes(destinationFIle);
         return Base64.encodeBase64String(imageBytes);
     }

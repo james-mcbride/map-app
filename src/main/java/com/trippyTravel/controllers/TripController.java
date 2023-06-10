@@ -53,7 +53,7 @@ public class TripController {
                 }
             }
             if (profileImageId != null) {
-                trip.setTrip_profile_image(imageService.getEncodedImageFileById(profileImageId));
+                trip.setTrip_profile_image(imageService.getEncodedImageFileById(profileImageId, "%s.jpeg"));
             }
             tripsSubList.add(trip);
         }
@@ -145,7 +145,7 @@ public class TripController {
                 }
             }
             if (profileImageId != null) {
-                trip.setTrip_profile_image(imageService.getEncodedImageFileById(profileImageId));
+                trip.setTrip_profile_image(imageService.getEncodedImageFileById(profileImageId, "%s.jpeg"));
             }
         }
         return trips;

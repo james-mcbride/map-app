@@ -38,6 +38,17 @@ public class Image {
     @Column(columnDefinition = "text")
     private String description;
 
+    public String getFileType() {
+        return fileType;
+    }
+
+    public void setFileType(String fileType) {
+        this.fileType = fileType;
+    }
+
+    @Column(nullable = false, length = 250)
+    private String fileType;
+
     public Image(){}
 
     public Image(String imgUrl, User user, Location location){
@@ -46,8 +57,9 @@ public class Image {
     this.location=location;
 }
 
-public Image(Trip trip) {
+public Image(Trip trip, String fileType) {
         this.trip = trip;
+        this.fileType = fileType;
 }
 
     public Image(long id, User user, Location location, String image_location) {
