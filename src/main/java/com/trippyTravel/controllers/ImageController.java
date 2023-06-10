@@ -122,8 +122,9 @@ public class ImageController {
         image.setDescription((String) data.get("description"));
         byte[] decodedImage = Base64.decodeBase64((String) data.get("image"));
         String destinationFileType = "%s.jpeg";
-        if (fileType.equals("video/quicktime")){
-            destinationFileType = "%s.mp4";
+        if (image.getFileType() != null) {
+            destinationFileType = "%s.";
+            destinationFileType += image.getFileType().split("/")[1];
         }
         Path destinationFIle = Paths.get("/Users/jimmiemcbride/Pictures/mapapp", String.format(destinationFileType, Long.toString(image.getId())));
         Files.write(destinationFIle, decodedImage);

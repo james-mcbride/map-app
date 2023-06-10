@@ -285,7 +285,7 @@ function ViewTrip({open, tripId, onClose, onTripUpdate}) {
         reader.onloadend = function () {
             loadedImagesMap[`${index}`] = reader.result
             axios.post(`http://192.168.86.169:8090/trip/${tripId}/images`, {
-                fileType: reader.result.split(";")[0].replace("data:", ""),
+                fileType: reader.result.split(";")[0].replace("data:", "").replace("quicktime", "mp4"),
                 image: reader.result.split(",")[1],
                 description: `${index}`
             })

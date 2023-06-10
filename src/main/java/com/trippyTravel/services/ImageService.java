@@ -20,8 +20,9 @@ public class ImageService {
     public String getEncodedImageFile(Image image) throws IOException {
         String imageId = Long.toString(image.getId());
         String fileType = "%s.jpeg";
-        if (image.getFileType().equals("video/quicktime")) {
-            fileType = "%s.mp4";
+        if (image.getFileType() != null && image.getFileType().length() > 0) {
+            fileType = "%s.";
+            fileType += image.getFileType().split("/")[1];
         }
         return getEncodedImageFileById(imageId, fileType);
     }
