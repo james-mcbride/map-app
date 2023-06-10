@@ -90,7 +90,7 @@ function ImageModal({open, modalImage, onClose, activities, imageActivity, editi
                         <label htlmFor="activitySelect">
                             Activity
                             <select id="activitySelect" value={activityId} onChange={e => {
-                                setActivityId(e.target.value)
+                                setActivityId(e.target.value === "" ? null : e.target.value)
                                 activities.forEach(activity => {
                                     if (activity.id === e.target.value) {
                                     }

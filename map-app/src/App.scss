@@ -343,7 +343,7 @@ html, body, #root, .App,.map-container-fullscreen {
   position: absolute;
   border: 1px solid rgb(204, 204, 204);
   background: rgb(255, 255, 255);
-  overflow: auto;
+  //overflow: auto;
   border-radius: 4px;
   outline: none;
   left: 10vw;
@@ -460,7 +460,7 @@ html, body, #root, .App,.map-container-fullscreen {
   right: calc(100vw / 10);
   bottom: calc(100vh / 4);
   position: absolute;
-  z-index:1000;
+  z-index:6;
   img {
     width: calc((100vh) / 12);
     height: calc(100vh / 12);
@@ -630,4 +630,24 @@ html, body, #root, .App,.map-container-fullscreen {
 .team-modal-button {
   right: 5px;
   position: absolute;
+}
+
+
+.team-images-div {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
+  margin-top: 10px;
+  position: absolute;
+  left: 33vw;
+  width: 55vw;
+  height: 80vh;
+  overflow: scroll;
+  top: -3vh;
+
+  .view-trip-image{
+    width: 25vw;
+    height: 25vw;
+    margin: 1vw;
+  }
 }

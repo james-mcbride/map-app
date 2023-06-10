@@ -1,9 +1,39 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import ReactModal from 'react-modal';
 import defaultImage from "./images/airplane.png";
 import nflTeams from "./utils/nflTeams";
+import axios from "axios";
+import Image from "./Image";
 
-function TeamModal({team, trips, isOpen, closeModal}) {
+function TeamModal({trips, isOpen, closeModal}) {
+
+    const [selectedTripId, setSelectedTripId] = useState(null)
+    const [images, setImages] = useState([])
+
+    useEffect(() => {
+        if (selectedTripId && isOpen) {
+            axios.get(`http://192.168.86.169:8090/trip/${selectedTripId}/images`)
+                .then(response => {
+                    if (response.data.length <= 5) {
+                        setImages(response.data);
+                    } else {
+                        retrieveImage(response.data, 0)
+                    }
+                })
+        }
+    }, [selectedTripId, isOpen])
+
+    function retrieveImage(imageList, index) {
+        if (index < imageList.length) {
+            axios.get(`http://192.168.86.169:8090/image/${imageList[index].id}`)
+                .then(response => {
+                    imageList[index].image_location = response.data.image_location
+                    setImages([...imageList])
+                    retrieveImage(imageList, index + 1)
+                })
+        }
+    }
+
     const teamTrips = trips ? trips : []
 
     const gameDate = date => {
@@ -22,7 +52,11 @@ function TeamModal({team, trips, isOpen, closeModal}) {
     }
 
     const tripList = teamTrips.map(trip => (
-        <div className="trip-game-info-container" style={{background: getTeamInfo(trips?.length > 0 ? trips[0].categoryItem : null)?.secondaryColor}}>
+        <div
+            className="trip-game-info-container"
+            style={{background: getTeamInfo(trips?.length > 0 ? trips[0].categoryItem : null)?.secondaryColor}}
+            onClick={() => setSelectedTripId(trip.id)}
+        >
         <div className="trip-game-info">
             <div className="trip-profile-image-modal">
                 <img src={trip?.trip_profile_image ? `data:image/jpeg;base64,${trip?.trip_profile_image}` : defaultImage}/>
@@ -51,16 +85,31 @@ function TeamModal({team, trips, isOpen, closeModal}) {
         </div>
         </div>
     ))
+
+    const imageList = images.filter(image => {
+        return image.image_location
+    }).map(image => {
+        return <Image imageFile={image} editImage={false} imageIdsForNewActivity={[]}
+                      key={image.id}/>
+    })
+
     return (
         <ReactModal isOpen={isOpen} className="view-team-modal" style={{background: `7F${getTeamInfo(trips?.length > 0 ? trips[0].categoryItem : null)?.primaryColor}`, border: `1px solid ${trips?.length > 0 ? getTeamInfo(trips[0].categoryItem)?.secondaryColor : null}`}}>
             <div className="view-team-modal-div" style={{background: getTeamInfo(trips?.length > 0 ? trips[0].categoryItem : null)?.primaryColor, border: `5px solid ${trips?.length > 0 ? getTeamInfo(trips[0].categoryItem)?.secondaryColor : null}`, color: getTeamInfo(trips?.length > 0 ? trips[0].categoryItem : null)?.secondaryColor}}>
                 <button
                     className="team-modal-button"
-                    onClick={() => closeModal()}
+                    onClick={() => {
+                        setImages([])
+                        setSelectedTripId(null)
+                        closeModal()
+                    }}
                     style={{background: getTeamInfo(trips?.length > 0 ? trips[0].categoryItem : null)?.secondaryColor, color: getTeamInfo(trips?.length > 0 ? trips[0].categoryItem : null)?.primaryColor}}
                 >close</button>
                 <h1 className="team-modal-header">{getTeamInfo(trips?.length > 0 ? trips[0].categoryItem : null)?.Team}</h1>
                 {tripList}
+            </div>
+            <div className="team-images-div">
+                {imageList}
             </div>
         </ReactModal>
     )

@@ -38,6 +38,7 @@ function ViewTrip({open, tripId, onClose, onTripUpdate}) {
     const [categoryItemDetail1, setCategoryItemDetail1] = useState(null)
     const [categoryItemDetail2, setCategoryItemDetail2] = useState(null)
     const [categoryItemDetail3, setCategoryItemDetail3] = useState(null)
+    const [selectedActivity, setSelectedActivity] = useState(null)
 
 
     useEffect(() => {
@@ -79,6 +80,9 @@ function ViewTrip({open, tripId, onClose, onTripUpdate}) {
                 .then(response => {
                     setParentTrips(response.data)
                 })
+        }
+        if (!open){
+            setSelectedActivity(null)
         }
     }, [open])
 
@@ -333,7 +337,7 @@ function ViewTrip({open, tripId, onClose, onTripUpdate}) {
     }
     const displayImages = imageList => {
         return imageList.filter(image => {
-            return image.image_location
+            return image.image_location && (!selectedActivity || image?.activity?.location === selectedActivity)
         }).map(image => {
             return <Image imageFile={image} editImage={editImage} imageIdsForNewActivity={imageIdsForActivity}
                           key={image.id}/>
@@ -349,7 +353,7 @@ function ViewTrip({open, tripId, onClose, onTripUpdate}) {
         })
         const allTripImages = images.concat(additionalTripImages)
         return allTripImages.filter(image => {
-            return image.image_location
+            return image.image_location && (!selectedActivity || image.trip.location === selectedActivity)
         }).map(image => {
             return <Image imageFile={image} editImage={editImage} imageIdsForNewActivity={imageIdsForActivity}
                           key={image.id}/>
@@ -359,12 +363,15 @@ function ViewTrip({open, tripId, onClose, onTripUpdate}) {
 
     const filterTripsForMarkerEvent = (tripLocation) => {
         setLocationsClickedStatus(obj => {
-            const updatedTripLocationsObj = {...obj}
-            Object.keys(updatedTripLocationsObj).forEach(location => {
+            const currentTripLocationsObj = {...obj}
+            const updatedTripLocationsObj = {}
+            Object.keys(currentTripLocationsObj).forEach(location => {
                 if (tripLocation !== location)
                     updatedTripLocationsObj[location] = false
             })
-            updatedTripLocationsObj[tripLocation] = !updatedTripLocationsObj[tripLocation]
+            const selectedTripLocationStatus = !currentTripLocationsObj[tripLocation]
+            updatedTripLocationsObj[tripLocation] = selectedTripLocationStatus
+            setSelectedActivity(selectedTripLocationStatus ? tripLocation : null)
             return updatedTripLocationsObj
         })
     }
@@ -377,6 +384,7 @@ function ViewTrip({open, tripId, onClose, onTripUpdate}) {
             return (
                 <a onClick={() => {
                     setParentTripSelected(false)
+                    setSelectedActivity(null)
                     setLocation(trip.location)
                     setName(trip.name)
                     setStartDate(trip.startDate.split(" ")[0])
@@ -431,6 +439,7 @@ function ViewTrip({open, tripId, onClose, onTripUpdate}) {
                             parentTripSelected ? <div id="children-trip-links">{getChildrenTripLinks()}</div> :
                                 parentTripName ? <a type="text" onClick={() => {
                                     setParentTripSelected(true)
+                                    setSelectedActivity(null)
                                     childTrips.forEach((trip) => {
                                         if (trip.id !== tripId && !fetchedImagesForChildTrips) {
                                             retrieveImagesForChildTrip(trip.id)
@@ -589,6 +598,9 @@ function ViewTrip({open, tripId, onClose, onTripUpdate}) {
                     </div>
                 </div>
                 }
+                {(tripId && selectedActivity) && (
+                    <h1 style={{textAlign: "center"}}>{selectedActivity}</h1>
+                ) }
                 {tripId && (<div id="view-trip-images">
                     {displayTripImages(selectedChildTrip, parentTripSelected)}
                 </div>)}
