@@ -40,6 +40,7 @@ function ViewTrip({open, tripId, onClose, onTripUpdate}) {
     const [categoryItemDetail2, setCategoryItemDetail2] = useState(null)
     const [categoryItemDetail3, setCategoryItemDetail3] = useState(null)
     const [selectedActivity, setSelectedActivity] = useState(null)
+    const [lastImageIndexRetrieved, setLastImageIndexRetrieved] = useState(null)
 
 
     useEffect(() => {
@@ -55,7 +56,7 @@ function ViewTrip({open, tripId, onClose, onTripUpdate}) {
                     setCategory(response.data.category)
                     setCategoryItem(response.data.categoryItem)
                     setCategoryItemDetail1(response.data.categoryItemDetail1 ? response.data.categoryItemDetail1 : '')
-                    setCategoryItemDetail2(response.data.categoryItemDetail2  ? response.data.categoryItemDetail2 : '')
+                    setCategoryItemDetail2(response.data.categoryItemDetail2 ? response.data.categoryItemDetail2 : '')
                     setCategoryItemDetail3(response.data.categoryItemDetail3 ? response.data.categoryItemDetail3 : '')
 
                     if (response.data.activities) {
@@ -70,7 +71,7 @@ function ViewTrip({open, tripId, onClose, onTripUpdate}) {
                     if (response.data.length <= 5) {
                         setImages(response.data);
                     } else {
-                        retrieveImage(response.data, 0)
+                        retrieveImage(response.data, 0, 12)
                     }
                 })
             axios.get(`http://192.168.86.169:8090/trip/${tripId}/activities`)
@@ -82,8 +83,9 @@ function ViewTrip({open, tripId, onClose, onTripUpdate}) {
                     setParentTrips(response.data)
                 })
         }
-        if (!open){
+        if (!open) {
             setSelectedActivity(null)
+            setLastImageIndexRetrieved(null)
         }
     }, [open])
 
@@ -105,14 +107,16 @@ function ViewTrip({open, tripId, onClose, onTripUpdate}) {
             })
     }
 
-    function retrieveImage(imageList, index) {
-        if (index < imageList.length) {
+    function retrieveImage(imageList, index, indexToStopOn) {
+        if (index < indexToStopOn && index < imageList.length) {
             axios.get(`http://192.168.86.169:8090/image/${imageList[index].id}`)
                 .then(response => {
                     imageList[index].image_location = response.data.image_location
                     setImages([...imageList])
-                    retrieveImage(imageList, index + 1)
+                    retrieveImage(imageList, index + 1, indexToStopOn)
                 })
+        } else {
+            setLastImageIndexRetrieved(index)
         }
     }
 
@@ -149,7 +153,7 @@ function ViewTrip({open, tripId, onClose, onTripUpdate}) {
     const editImage = image => {
         if (openAddActivitiesModal) {
             const imageIds = [...imageIdsForActivity]
-            if (imageIds.includes(image.id)){
+            if (imageIds.includes(image.id)) {
                 setImageIdsForActivity(imageIds.filter(imageId => imageId !== image.id))
             } else {
                 imageIds.push(image.id)
@@ -205,8 +209,6 @@ function ViewTrip({open, tripId, onClose, onTripUpdate}) {
                     "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Requested-With",
                 }
             }).then(res => {
-                // const updatedTripObj = res.data
-                // updatedTripObj.latestProfilePic = getProfilePictureFromImages(res.data.trip_profile_image)
                 res.data.trip_profile_image = getProfilePictureFromImages()?.image
                 onTripUpdate(res.data);
                 console.log("Request complete! response:", res);
@@ -276,49 +278,23 @@ function ViewTrip({open, tripId, onClose, onTripUpdate}) {
         });
     }
 
-    // const addImages = async e => {
-    //     const files = Object.values(e.target.files)
-    //
-    //
-    //     newFiles.forEach(file => {
-    //     const reader = new FileReader();
-    //     const loadedImages = [...images]
-    //     const loadedImagesMap = {}
-    //     let index = 0
-    //     reader.onloadend = function () {
-    //         loadedImagesMap[`${index}`] = reader.result
-    //         axios.post(`http://192.168.86.169:8090/trip/${tripId}/images`, {
-    //             fileType: reader.result.split(";")[0].replace("data:", "").replace("quicktime", "mp4"),
-    //             image: reader.result.split(",")[1],
-    //             description: `${index}`
-    //         })
-    //             .then(res => {
-    //                 const image = res.data
-    //                 image.image_location = loadedImagesMap[image.description]?.replace("data:image/jpeg;base64,", "")
-    //                 loadedImages.push(image)
-    //                 setImages([...loadedImages])
-    //             })
-    //         index += 1
-    //         if (index < newFiles.length) {
-    //             reader.readAsDataURL(newFiles[index])
-    //         }
-    //     }
-    //     reader.readAsDataURL(newFiles[0])
-    // })
-    // }
-
     const addImages = async e => {
         const files = Object.values(e.target.files)
+        const lastImageIndexRetrievedNum = lastImageIndexRetrieved ? lastImageIndexRetrieved : 0
+        setLastImageIndexRetrieved(lastImageIndexRetrievedNum + files.length)
         const newFiles = await Promise.all(files.map(async file => {
             let updatedFile = file
-            if(file.type.includes("heic")) {
+            if (file.type.includes("heic")) {
                 let blob = file //ev.target.files[0];
                 await heic2any({
                     blob: blob,
                     toType: "image/jpg",
                 })
                     .then(function (resultBlob) {
-                        updatedFile = new File([resultBlob], "heic"+".jpg",{type:"image/jpeg", lastModified:new Date().getTime()});
+                        updatedFile = new File([resultBlob], "heic" + ".jpg", {
+                            type: "image/jpeg",
+                            lastModified: new Date().getTime()
+                        });
                         return updatedFile
                     })
                     .catch(function (x) {
@@ -342,7 +318,7 @@ function ViewTrip({open, tripId, onClose, onTripUpdate}) {
                 .then(res => {
                     const image = res.data
                     image.image_location = loadedImagesMap[image.description]?.replace("data:image/jpeg;base64,", "")
-                    loadedImages.push(image)
+                    loadedImages.unshift(image)
                     setImages([...loadedImages])
                 })
             index += 1
@@ -389,9 +365,18 @@ function ViewTrip({open, tripId, onClose, onTripUpdate}) {
     const displayImages = imageList => {
         return imageList.filter(image => {
             return image.image_location && (!selectedActivity || image?.activity?.location === selectedActivity)
-        }).map(image => {
-            return <Image imageFile={image} editImage={editImage} imageIdsForNewActivity={imageIdsForActivity}
-                          key={image.id}/>
+        }).map((image, index) => {
+            return <Image
+                imageFile={image}
+                editImage={editImage}
+                imageIdsForNewActivity={imageIdsForActivity}
+                key={image.id}
+                imageIsInView={() => {
+                    if (lastImageIndexRetrieved - index === 4) {
+                        retrieveImage(images, lastImageIndexRetrieved, lastImageIndexRetrieved + 8)
+                    }
+                }
+                }/>
         })
     }
 
@@ -471,7 +456,7 @@ function ViewTrip({open, tripId, onClose, onTripUpdate}) {
     const locationList = locationActivityList?.length > 0 ? locationActivityList : [location]
     return (
         <ReactModal isOpen={open} className="view-trip-modal">
-            <div >
+            <div>
                 {openAddActivitiesModal && <div id="add-activities-popup">
                     Add activity to other images: {imageIdsForActivity.length} selected <br/>
                     <button onClick={() => {
@@ -510,7 +495,7 @@ function ViewTrip({open, tripId, onClose, onTripUpdate}) {
                         setImages([]);
                         if (images?.length) {
                             onClose(getLatestTripWithProfilePictureWhenClosing(), false)
-                        } else{
+                        } else {
                             onClose()
                         }
                         setParentTripSelected(false)
@@ -607,13 +592,15 @@ function ViewTrip({open, tripId, onClose, onTripUpdate}) {
                         {category === "NFL" && (
                             <label htlmFor="categoryItemDetail2">
                                 Home Team Score
-                                <input id="categoryItemDetail2" value={categoryItemDetail2} onChange={e => setCategoryItemDetail2(e.target.value)}/>
+                                <input id="categoryItemDetail2" value={categoryItemDetail2}
+                                       onChange={e => setCategoryItemDetail2(e.target.value)}/>
                             </label>
                         )}
                         {category === "NFL" && (
                             <label htlmFor="categoryItemDetail3">
                                 Away Team Score
-                                <input id="categoryItemDetail3" value={categoryItemDetail3} onChange={e => setCategoryItemDetail3(e.target.value)}/>
+                                <input id="categoryItemDetail3" value={categoryItemDetail3}
+                                       onChange={e => setCategoryItemDetail3(e.target.value)}/>
 
                             </label>
                         )}
@@ -651,7 +638,7 @@ function ViewTrip({open, tripId, onClose, onTripUpdate}) {
                 }
                 {(tripId && selectedActivity) && (
                     <h1 style={{textAlign: "center"}}>{selectedActivity}</h1>
-                ) }
+                )}
                 {tripId && (<div id="view-trip-images">
                     {displayTripImages(selectedChildTrip, parentTripSelected)}
                 </div>)}

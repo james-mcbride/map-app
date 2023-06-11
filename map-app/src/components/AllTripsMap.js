@@ -1,6 +1,6 @@
 import React, {useRef, useEffect, useState} from 'react';
 import mapboxgl from '!mapbox-gl'; // eslint-disable-line import/no-webpack-loader-syntax
-import { accessToken} from "./tokens";
+import {accessToken} from "./tokens";
 
 function AllTripsMap({locations, onMarkerEvent, locationsClickedStatus, location, includeZoom = false, initialZoomLevel, onTripsPage, retrievingLocations, viewingMultipleTrips}) {
     mapboxgl.accessToken = accessToken;
@@ -77,27 +77,27 @@ function AllTripsMap({locations, onMarkerEvent, locationsClickedStatus, location
             console.log("fetching locations")
             console.log(locations)
             locations.forEach((activityLocation, index) => {
-            fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${activityLocation}.json?access_token=${accessToken}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.features) {
-                        const coordinates = {
-                            lng: data.features[0].center[0],
-                            lat: data.features[0].center[1]
-                        }
-                        locationCoordinates.push(coordinates)
-                        if (index === (locations.length - 1)) {
-                            console.log("setting location coordinate list")
-                            setLocationCoordinateList(locationCoordinates)
-                        }
+                fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${activityLocation}.json?access_token=${accessToken}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.features) {
+                            const coordinates = {
+                                lng: data.features[0].center[0],
+                                lat: data.features[0].center[1]
+                            }
+                            locationCoordinates.push(coordinates)
+                            if (index === (locations.length - 1)) {
+                                console.log("setting location coordinate list")
+                                setLocationCoordinateList(locationCoordinates)
+                            }
 
-                        const marker = new mapboxgl.Marker({scale: 0.5})
-                            .setLngLat(coordinates)
-                            .addTo(map.current);
-                        addListenersToMarker(marker, activityLocation)
-                        markersObj[activityLocation] = marker
-                    }
-                })
+                            const marker = new mapboxgl.Marker({scale: 0.5})
+                                .setLngLat(coordinates)
+                                .addTo(map.current);
+                            addListenersToMarker(marker, activityLocation)
+                            markersObj[activityLocation] = marker
+                        }
+                    })
             })
             setLocationMarkersObj(markersObj)
         }
@@ -110,7 +110,9 @@ function AllTripsMap({locations, onMarkerEvent, locationsClickedStatus, location
             const timeout = setTimeout(() => {
                 if (viewingMultipleTrips) {
                     const newCenterCoordinates = setNewMapCenter()
-                    getZoom(newCenterCoordinates)
+                    if (newCenterCoordinates) {
+                        getZoom(newCenterCoordinates)
+                    }
                 } else {
                     getZoom()
                 }
@@ -121,26 +123,28 @@ function AllTripsMap({locations, onMarkerEvent, locationsClickedStatus, location
 
     const setNewMapCenter = () => {
         const locationCoordinateListFiltered = locationCoordinateList.filter(coordinate => coordinate?.lat && coordinate?.lng)
-        let middleLat = (Math.min(...locationCoordinateListFiltered.map(coordinate => coordinate.lat)) + Math.max(...locationCoordinateListFiltered.map(coordinate => coordinate.lat)))/2
-        let middleLng = (Math.min(...locationCoordinateListFiltered.map(coordinate => coordinate.lng)) + Math.max(...locationCoordinateListFiltered.map(coordinate => coordinate.lng)))/2
-        // locationCoordinateList.forEach(coordinates => {
-        //     totalLat += coordinates.lat
-        //     totalLng += coordinates.lng
-        // })
-        // const newCenterCoordinates = {
-        //     lng: totalLng/locationCoordinateList.length,
-        //     lat: totalLat/locationCoordinateList.length
-        // }
-        const newCenterCoordinates = {
-            lat: middleLat,
-            lng: middleLng
+        if (locationCoordinateListFiltered?.length > 0) {
+            let middleLat = (Math.min(...locationCoordinateListFiltered.map(coordinate => coordinate.lat)) + Math.max(...locationCoordinateListFiltered.map(coordinate => coordinate.lat))) / 2
+            let middleLng = (Math.min(...locationCoordinateListFiltered.map(coordinate => coordinate.lng)) + Math.max(...locationCoordinateListFiltered.map(coordinate => coordinate.lng))) / 2
+            // locationCoordinateList.forEach(coordinates => {
+            //     totalLat += coordinates.lat
+            //     totalLng += coordinates.lng
+            // })
+            // const newCenterCoordinates = {
+            //     lng: totalLng/locationCoordinateList.length,
+            //     lat: totalLat/locationCoordinateList.length
+            // }
+            const newCenterCoordinates = {
+                lat: middleLat,
+                lng: middleLng
+            }
+            map.current.flyTo({
+                center: newCenterCoordinates,
+                animate: true,
+                duration: 1000
+            });
+            return newCenterCoordinates
         }
-        map.current.flyTo({
-            center: newCenterCoordinates,
-            animate:true,
-            duration: 1000
-        });
-        return newCenterCoordinates
     }
 
     const getZoom = (newCenterCoordinates = null) => {
@@ -186,7 +190,7 @@ function AllTripsMap({locations, onMarkerEvent, locationsClickedStatus, location
                 if (zoom !== zoomLevel) {
                     setZoom(zoomLevel)
                     setTimeout(() => {
-                        map.current.zoomTo(zoomLevel-.25, {duration: 1000, animate: true})
+                        map.current.zoomTo(zoomLevel - .25, {duration: 1000, animate: true})
                     }, 500)
                 }
             }
@@ -195,7 +199,7 @@ function AllTripsMap({locations, onMarkerEvent, locationsClickedStatus, location
 
     function addListenersToMarker(marker, location) {
         const markerDiv = marker.getElement();
-        markerDiv.addEventListener('click', () => onMarkerEvent( location))
+        markerDiv.addEventListener('click', () => onMarkerEvent(location))
     }
 
     useEffect(() => {

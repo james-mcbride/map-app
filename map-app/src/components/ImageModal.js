@@ -64,11 +64,12 @@ function ImageModal({open, modalImage, onClose, activities, imageActivity, editi
             return <option value={activity.id}>{activity.name}</option>
         })
     }
+    const imageUrl = modalImage?.fileType ? `data:${modalImage.fileType};base64,${modalImage?.image_location}` : `data:image/jpeg;base64,${modalImage?.image_location}`
     return (
         <ReactModal isOpen={open} id="view-image-modal">
             <div id="view-image-modal-div" style={!editingImage ? {height: "87%"} : {}}>
                 <button id="edit-image-modal-button" onClick={() => setEditingImage(!editingImage)}>
-                    {editingImage ? "View Image" : "Edit Image"}
+                    {editingImage ? `View ${modalImage?.fileType?.includes("video") ? "Video" : "Image"}` : `Edit ${modalImage?.fileType?.includes("video") ? "Video" : "Image"}`}
                 </button>
                 <button id="close-image-modal-button" onClick={() => {
                     clearState();
@@ -76,7 +77,12 @@ function ImageModal({open, modalImage, onClose, activities, imageActivity, editi
                 }}>
                     Close
                 </button>
-                <img src={`data:image/jpeg;base64,${modalImage?.image_location}`}/>
+                {modalImage?.fileType?.includes("video") ? <video
+                        src={imageUrl}
+                        controls autoPlay
+                    /> :
+                    <img src={imageUrl} />
+                }
             </div>
             {editingImage ? <div>
                     <div id="image-modal-input">

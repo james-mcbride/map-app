@@ -19,7 +19,7 @@ public interface TripRepository extends JpaRepository<Trip,Long> {
     @Query(nativeQuery = true, value="SELECT DISTINCT parent_trip FROM trips")
     List<String> findAllParentTrips();
 
-    @Query(nativeQuery = true, value="SELECT * from trips LIMIT 5 offset :offset")
+    @Query(nativeQuery = true, value="SELECT * from trips order by start_date DESC LIMIT 12 offset :offset ")
     List<Trip> findTripsWithPageLimit(@Param("offset") long offset);
 
     List<Trip> findAllByOrderByIdDesc();
@@ -30,6 +30,9 @@ public interface TripRepository extends JpaRepository<Trip,Long> {
     List<Trip> findTripsByParentTrip(String parentTripName);
 
     List<Trip> findTripsByCategory(String category);
+
+    @Query("from Trip trip where lower(trip.location) like lower(concat('%', :location,'%'))")
+    List<Trip> findTripsByLocationLike(String location);
 
 }
 

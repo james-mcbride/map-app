@@ -286,6 +286,7 @@ html, body, #root, .App,.map-container-fullscreen {
 #trip-list {
   display: flex;
   flex-wrap: wrap;
+  padding-bottom: 40px;
 }
 
 .map-container {
@@ -651,3 +652,29 @@ html, body, #root, .App,.map-container-fullscreen {
     margin: 1vw;
   }
 }
+
+.trips-pagination-buttons {
+  position: absolute;
+  bottom: 5px;
+  right: 25px;
+  display: flex;
+  width: fit-content;
+  justify-content: space-evenly;
+
+  button{
+    padding: 5px;
+    margin: 3px;
+    font-size: medium;
+  }
+  button:disabled {
+    background: darkgray;
+  }
+}
+
+.spinner-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 100px;
+}
+

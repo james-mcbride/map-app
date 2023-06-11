@@ -1,7 +1,7 @@
 import React, {useEffect, useRef, useState} from "react";
 import VisibilitySensor from 'react-visibility-sensor';
 
-function Image({imageFile, editImage, imageIdsForNewActivity}) {
+function Image({imageFile, editImage, imageIdsForNewActivity, imageIsInView}) {
     const [imageUrl, setImageUrl] = useState("")
     const [isVisible, setIsVisible] = useState(false)
     const videoRef = useRef(null);
@@ -27,7 +27,12 @@ function Image({imageFile, editImage, imageIdsForNewActivity}) {
     }, [isVisible, videoRef]);
 
     return (
-        <VisibilitySensor onChange={(isVisible) => setIsVisible(isVisible)}>
+        <VisibilitySensor onChange={(isVisible) => {
+            if (typeof imageIsInView == 'function' ){
+                imageIsInView()
+            }
+            setIsVisible(isVisible)
+        }}>
         <div className="view-trip-image-div" onClick={() => editImage(imageFile)}>
             {imageFile.fileType?.includes("video") ? <video
                     src={imageUrl} className="view-trip-image"

@@ -2,6 +2,7 @@ package com.trippyTravel.controllers;
 import com.trippyTravel.models.*;
 import com.trippyTravel.repositories.*;
 import com.trippyTravel.services.ImageService;
+import com.trippyTravel.services.TripService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -26,41 +27,45 @@ public class TripController {
     @Autowired
     private final ActivityRepository activityRepository;
 
-    public TripController(TripRepository tripRepository, ImageRepository imageRepository, ImageService imageService, ActivityRepository activityRepository) {
+    @Autowired
+    private final TripService tripService;
+
+    public TripController(TripRepository tripRepository, ImageRepository imageRepository, ImageService imageService, ActivityRepository activityRepository, TripService tripService) {
         this.tripRepository = tripRepository;
         this.imageRepository = imageRepository;
         this.imageService = imageService;
         this.activityRepository = activityRepository;
+        this.tripService = tripService;
     }
 
     @CrossOrigin
     @RequestMapping(value = "/trip/page/{page}", method = RequestMethod.GET, produces = "application/json")
     public @ResponseBody
-    Map<String, Object> retrieveAllTrips(@PathVariable long page) throws IOException {
-        List<Trip> trips = tripRepository.findTripsWithPageLimit(page * 5);
-        long count = tripRepository.getNumTrips();
+    Map<String, Object> retrieveTripsByPage(@PathVariable long page) throws IOException {
+        List<Trip> trips = tripRepository.findTripsWithPageLimit(page * 12);
+        List<Trip> allTrips = tripRepository.findAll();
         List<String> locations = new ArrayList<>();
-        List<Trip> tripsSubList = new ArrayList<>();
-        for (int i = 0; i < trips.size(); i++) {
-            Trip trip = trips.get(i);
+        for (int i = 0; i < allTrips.size(); i++) {
+            Trip trip = allTrips.get(i);
             locations.add(trip.getLocation());
-            String profileImageId = null;
-            if (trip.getTrip_profile_image() != null) {
-                profileImageId = trip.getTrip_profile_image();
-            } else {
-                if (trip.getImages().size() > 0) {
-                    profileImageId = Long.toString(trip.getImages().get(0).getId());
-                }
-            }
-            if (profileImageId != null) {
-                trip.setTrip_profile_image(imageService.getEncodedImageFileById(profileImageId, "%s.jpeg"));
-            }
-            tripsSubList.add(trip);
         }
+        long count = tripRepository.getNumTrips();
+        List<Trip> tripsSubList = tripService.addImagesToTrips(trips);
         HashMap<String, Object> map = new HashMap<>();
         map.put("locations", locations);
         map.put("trips", tripsSubList);
         map.put("numTrips", count);
+        return map;
+    }
+
+    @CrossOrigin
+    @RequestMapping(value = "/trip/location/{location}", method = RequestMethod.GET, produces = "application/json")
+    public @ResponseBody
+    Map<String, Object> retrieveTripsByLocation(@PathVariable String location) throws IOException {
+        List<Trip> trips = tripRepository.findTripsByLocationLike(location);
+        List<Trip> tripsWithImages = tripService.addImagesToTrips(trips);
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("trips", tripsWithImages);
         return map;
     }
 
