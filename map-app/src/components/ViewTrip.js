@@ -8,6 +8,7 @@ import AllTripsMap from "./AllTripsMap";
 import {confirmAlert} from 'react-confirm-alert';
 import 'react-confirm-alert/src/react-confirm-alert.css';
 import nflTeams from "./utils/nflTeams";
+import heic2any from 'heic2any'
 
 function ViewTrip({open, tripId, onClose, onTripUpdate}) {
     // const tripId = window.location.pathname.split("/")[2];
@@ -275,9 +276,58 @@ function ViewTrip({open, tripId, onClose, onTripUpdate}) {
         });
     }
 
+    // const addImages = async e => {
+    //     const files = Object.values(e.target.files)
+    //
+    //
+    //     newFiles.forEach(file => {
+    //     const reader = new FileReader();
+    //     const loadedImages = [...images]
+    //     const loadedImagesMap = {}
+    //     let index = 0
+    //     reader.onloadend = function () {
+    //         loadedImagesMap[`${index}`] = reader.result
+    //         axios.post(`http://192.168.86.169:8090/trip/${tripId}/images`, {
+    //             fileType: reader.result.split(";")[0].replace("data:", "").replace("quicktime", "mp4"),
+    //             image: reader.result.split(",")[1],
+    //             description: `${index}`
+    //         })
+    //             .then(res => {
+    //                 const image = res.data
+    //                 image.image_location = loadedImagesMap[image.description]?.replace("data:image/jpeg;base64,", "")
+    //                 loadedImages.push(image)
+    //                 setImages([...loadedImages])
+    //             })
+    //         index += 1
+    //         if (index < newFiles.length) {
+    //             reader.readAsDataURL(newFiles[index])
+    //         }
+    //     }
+    //     reader.readAsDataURL(newFiles[0])
+    // })
+    // }
 
-    const addImages = e => {
-        const newFiles = Object.values(e.target.files)
+    const addImages = async e => {
+        const files = Object.values(e.target.files)
+        const newFiles = await Promise.all(files.map(async file => {
+            let updatedFile = file
+            if(file.type.includes("heic")) {
+                let blob = file //ev.target.files[0];
+                await heic2any({
+                    blob: blob,
+                    toType: "image/jpg",
+                })
+                    .then(function (resultBlob) {
+                        updatedFile = new File([resultBlob], "heic"+".jpg",{type:"image/jpeg", lastModified:new Date().getTime()});
+                        return updatedFile
+                    })
+                    .catch(function (x) {
+                        console.log(x.code);
+                        console.log(x.message);
+                    });
+            }
+            return updatedFile;
+        }))
         const reader = new FileReader();
         const loadedImages = [...images]
         const loadedImagesMap = {}
@@ -300,7 +350,7 @@ function ViewTrip({open, tripId, onClose, onTripUpdate}) {
                 reader.readAsDataURL(newFiles[index])
             }
         }
-        reader.readAsDataURL(newFiles[0])
+        await reader.readAsDataURL(newFiles[0])
     }
 
     const updateTripActivities = updatedImage => {
