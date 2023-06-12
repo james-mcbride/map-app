@@ -3,8 +3,15 @@ import VisibilitySensor from 'react-visibility-sensor';
 
 function Image({imageFile, editImage, imageIdsForNewActivity, imageIsInView}) {
     const [imageUrl, setImageUrl] = useState("")
-    const [isVisible, setIsVisible] = useState(false)
+    const [isVisible, setIsVisible] = useState(true)
     const videoRef = useRef(null);
+    const [width, setWidth] = useState(window.innerWidth);
+
+    function handleWindowSizeChange() {
+        setWidth(window.innerWidth);
+    }
+
+    const isMobile = width <= 768;
 
     useEffect(() => {
         if (imageFile.image_location) {
@@ -12,11 +19,15 @@ function Image({imageFile, editImage, imageIdsForNewActivity, imageIsInView}) {
             const imageUrl = imageFile.image_location.includes("data:") ? imageFile.image_location : `${fileType},${imageFile.image_location}`
             setImageUrl(imageUrl)
         }
+        window.addEventListener('resize', handleWindowSizeChange);
+        return () => {
+            window.removeEventListener('resize', handleWindowSizeChange);
+        }
     }, [])
 
     useEffect(() => {
         if (videoRef.current) {
-            if (isVisible) {
+            if (isVisible && !isMobile) {
                 videoRef.current.play();
             } else {
                 if (videoRef.current.play) {
@@ -27,23 +38,25 @@ function Image({imageFile, editImage, imageIdsForNewActivity, imageIsInView}) {
     }, [isVisible, videoRef]);
 
     return (
-        <VisibilitySensor onChange={(isVisible) => {
+        <VisibilitySensor partialVisibility onChange={(isVisible) => {
             if (typeof imageIsInView == 'function' ){
                 imageIsInView()
             }
             setIsVisible(isVisible)
-        }}>
-        <div className="view-trip-image-div" onClick={() => editImage(imageFile)}>
-            {imageFile.fileType?.includes("video") ? <video
-                    src={imageUrl} className="view-trip-image"
-                    style={imageIdsForNewActivity.includes(imageFile.id) ? {opacity: 0.5} : {}}
-                    controls
-                    ref={videoRef}
-                /> :
-                <img src={imageUrl} className="view-trip-image"
-                     style={imageIdsForNewActivity.includes(imageFile.id) ? {opacity: 0.5} : {}}/>
-            }
-        </div>
+        }}
+        >
+
+                <div className="view-trip-image-div" style={isVisible ? {} : {visibility: "hidden"}} onClick={() => editImage(imageFile)}>
+                    {imageFile.fileType?.includes("video") ? <video
+                            src={imageUrl} className="view-trip-image"
+                            style={imageIdsForNewActivity.includes(imageFile.id) ? {opacity: 0.5} : {}}
+                            controls={!isMobile}
+                            ref={videoRef}
+                        /> :
+                        <img src={imageUrl} className="view-trip-image"
+                             style={imageIdsForNewActivity.includes(imageFile.id) ? {opacity: 0.5} : {}}/>
+                    }
+                </div>
         </VisibilitySensor>
     )
 }
