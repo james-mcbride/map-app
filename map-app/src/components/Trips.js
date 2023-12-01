@@ -26,7 +26,7 @@ function Trips() {
 
     function retrieveTrips(index) {
         if (!numTrips || index * 12 < numTrips) {
-            axios.get(`http://192.168.86.169:8090/trip/page/${index}`)
+            axios.get(`http://192.168.1.69:8090/trip/page/${index}`)
                 .then(response => {
                     if (index === 0) {
                         setNumTrips(response.data.numTrips)
@@ -52,7 +52,7 @@ function Trips() {
 
     function retrieveTripsByLocation(location) {
         const cityName = location.split(",")[0].toLowerCase();
-        axios.get(`http://192.168.86.169:8090/trip/location/${cityName}`)
+        axios.get(`http://192.168.1.69:8090/trip/location/${cityName}`)
             .then(response => {
                 setNumTrips(response.data.numTrips)
                 setTrips(response.data.trips);

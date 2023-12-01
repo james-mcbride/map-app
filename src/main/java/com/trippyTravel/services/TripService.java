@@ -28,6 +28,7 @@ public class TripService {
                 profileImageId = trip.getTrip_profile_image();
             } else {
                 if (trip.getImages().size() > 0) {
+                    if(trip.getImages().get(0).getFileType().equals("image/jpeg"))
                     profileImageId = Long.toString(trip.getImages().get(0).getId());
                 }
             }

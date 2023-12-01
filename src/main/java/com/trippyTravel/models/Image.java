@@ -49,6 +49,16 @@ public class Image {
     @Column(nullable = false, length = 250)
     private String fileType;
 
+    public boolean isVideoCoverImage() {
+        return isVideoCoverImage;
+    }
+
+    public void setVideoCoverImage(boolean videoCoverImage) {
+        isVideoCoverImage = videoCoverImage;
+    }
+
+    private boolean isVideoCoverImage;
+
     public Image(){}
 
     public Image(String imgUrl, User user, Location location){

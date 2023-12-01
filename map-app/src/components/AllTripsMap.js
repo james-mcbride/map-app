@@ -90,8 +90,8 @@ function AllTripsMap({locations, onMarkerEvent, locationsClickedStatus, location
                                 console.log("setting location coordinate list")
                                 setLocationCoordinateList(locationCoordinates)
                             }
-
-                            const marker = new mapboxgl.Marker({scale: 0.5})
+                            console.log("making new coordinate for: " + activityLocation)
+                            const marker = new mapboxgl.Marker({scale: onTripsPage ? 0.5 : 1.0})
                                 .setLngLat(coordinates)
                                 .addTo(map.current);
                             addListenersToMarker(marker, activityLocation)

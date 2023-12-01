@@ -5,13 +5,6 @@ function Image({imageFile, editImage, imageIdsForNewActivity, imageIsInView}) {
     const [imageUrl, setImageUrl] = useState("")
     const [isVisible, setIsVisible] = useState(true)
     const videoRef = useRef(null);
-    const [width, setWidth] = useState(window.innerWidth);
-
-    function handleWindowSizeChange() {
-        setWidth(window.innerWidth);
-    }
-
-    const isMobile = width <= 768;
 
     useEffect(() => {
         if (imageFile.image_location) {
@@ -19,15 +12,11 @@ function Image({imageFile, editImage, imageIdsForNewActivity, imageIsInView}) {
             const imageUrl = imageFile.image_location.includes("data:") ? imageFile.image_location : `${fileType},${imageFile.image_location}`
             setImageUrl(imageUrl)
         }
-        window.addEventListener('resize', handleWindowSizeChange);
-        return () => {
-            window.removeEventListener('resize', handleWindowSizeChange);
-        }
     }, [])
 
     useEffect(() => {
         if (videoRef.current) {
-            if (isVisible && !isMobile) {
+            if (isVisible) {
                 videoRef.current.play();
             } else {
                 if (videoRef.current.play) {
@@ -36,6 +25,18 @@ function Image({imageFile, editImage, imageIdsForNewActivity, imageIsInView}) {
             }
         }
     }, [isVisible, videoRef]);
+
+    const style = {}
+
+    if (imageIdsForNewActivity.includes(imageFile.id)) {
+        style.opacity = 0.5
+    }
+
+    // if (imageFile.videoCoverImage ) {
+    //     style.transform = "rotate(90deg)"
+    // }
+
+    console.log(style);
 
     return (
         <VisibilitySensor partialVisibility onChange={(isVisible) => {
@@ -46,15 +47,16 @@ function Image({imageFile, editImage, imageIdsForNewActivity, imageIsInView}) {
         }}
         >
 
-                <div className="view-trip-image-div" style={isVisible ? {} : {visibility: "hidden"}} onClick={() => editImage(imageFile)}>
+                <div className="view-trip-image-div"  onClick={() => editImage(imageFile)}>
                     {imageFile.fileType?.includes("video") ? <video
                             src={imageUrl} className="view-trip-image"
                             style={imageIdsForNewActivity.includes(imageFile.id) ? {opacity: 0.5} : {}}
-                            controls={!isMobile}
+                            controls
                             ref={videoRef}
+                            preload="metadata"
                         /> :
-                        <img src={imageUrl} className="view-trip-image"
-                             style={imageIdsForNewActivity.includes(imageFile.id) ? {opacity: 0.5} : {}}/>
+                        <img src={isVisible ? imageUrl : ""} className="view-trip-image"
+                             style={style}/>
                     }
                 </div>
         </VisibilitySensor>

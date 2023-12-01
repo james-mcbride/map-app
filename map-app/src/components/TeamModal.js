@@ -12,7 +12,7 @@ function TeamModal({trips, isOpen, closeModal}) {
 
     useEffect(() => {
         if (selectedTripId && isOpen) {
-            axios.get(`http://192.168.86.169:8090/trip/${selectedTripId}/images`)
+            axios.get(`http://192.168.1.69:8090/trip/${selectedTripId}/images`)
                 .then(response => {
                     if (response.data.length <= 5) {
                         setImages(response.data);
@@ -25,7 +25,7 @@ function TeamModal({trips, isOpen, closeModal}) {
 
     function retrieveImage(imageList, index) {
         if (index < imageList.length) {
-            axios.get(`http://192.168.86.169:8090/image/${imageList[index].id}`)
+            axios.get(`http://192.168.1.69:8090/image/${imageList[index].id}`)
                 .then(response => {
                     imageList[index].image_location = response.data.image_location
                     setImages([...imageList])

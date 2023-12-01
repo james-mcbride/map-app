@@ -12,7 +12,7 @@ function NflMapContainer() {
     const [teamModalOpen, setTeamModalOpen] = useState(false)
     const [selectedTeam, setSelectedTeam] = useState(null)
     useEffect(() => {
-        axios.get('http://192.168.86.169:8090/category/NFL')
+        axios.get('http://192.168.1.69:8090/category/NFL')
             .then(response => {
                 setTrips(response.data)
             })

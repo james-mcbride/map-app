@@ -17,20 +17,49 @@ public class ImageService {
     public ImageService(ImageRepository imageRepository) {
         this.imageRepository = imageRepository;
     }
-    public String getEncodedImageFile(Image image) throws IOException {
+    public Image addEncodedImageFileToImage(Image image, boolean userIsMobile) throws IOException {
         String imageId = Long.toString(image.getId());
         String fileType = "%s.jpeg";
         if (image.getFileType() != null && image.getFileType().length() > 0) {
             fileType = "%s.";
             fileType += image.getFileType().split("/")[1];
         }
-        return getEncodedImageFileById(imageId, fileType);
+        if (fileType.contains(".mp4") && userIsMobile){
+            Path videoImageFile = Paths.get("/Users/jimmiemcbride/Pictures/mapapp", String.format("%s.jpeg", imageId));
+            try {
+                byte[] imageBytes = Files.readAllBytes(videoImageFile);
+                image.setImage_location(Base64.encodeBase64String(imageBytes));
+                image.setVideoCoverImage(true);
+                image.setFileType("image/jpeg");
+                System.out.println("returning image instead of video for image id: " + image.getId());
+                return image;
+            } catch (Exception e) {
+                System.out.println(e);
+            }
+
+        }
+        Path destinationFIle = Paths.get("/Users/jimmiemcbride/Pictures/mapapp", String.format(fileType, imageId));
+        System.out.println(fileType);
+        byte[] imageBytes = Files.readAllBytes(destinationFIle);
+        image.setImage_location(Base64.encodeBase64String(imageBytes));
+        return image;
     }
 
     public String getEncodedImageFileById(String id, String fileType) throws IOException {
+        if (fileType.contains(".mp4")){
+            Path videoImageFile = Paths.get("/Users/jimmiemcbride/Pictures/mapapp", String.format("%s.jpeg", id));
+            try {
+                byte[] imageBytes = Files.readAllBytes(videoImageFile);
+                return Base64.encodeBase64String(imageBytes);
+            } catch (Exception e) {
+                System.out.println(e);
+            }
+
+        }
         Path destinationFIle = Paths.get("/Users/jimmiemcbride/Pictures/mapapp", String.format(fileType, id));
-        System.out.println("getting image from file with id: " + id + " and fileType: " + fileType);
+        System.out.println(fileType);
         byte[] imageBytes = Files.readAllBytes(destinationFIle);
         return Base64.encodeBase64String(imageBytes);
     }
+
 }

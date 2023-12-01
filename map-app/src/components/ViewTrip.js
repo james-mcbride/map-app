@@ -9,6 +9,7 @@ import {confirmAlert} from 'react-confirm-alert';
 import 'react-confirm-alert/src/react-confirm-alert.css';
 import nflTeams from "./utils/nflTeams";
 import heic2any from 'heic2any'
+import {userIsMobile} from "./utils/utils";
 
 function ViewTrip({open, tripId, onClose, onTripUpdate}) {
     // const tripId = window.location.pathname.split("/")[2];
@@ -45,7 +46,7 @@ function ViewTrip({open, tripId, onClose, onTripUpdate}) {
 
     useEffect(() => {
         if (tripId && open) {
-            axios.get(`http://192.168.86.169:8090/trip/${tripId}`)
+            axios.get(`http://192.168.1.69:8090/trip/${tripId}`)
                 .then(response => {
                     setLocation(response.data.location)
                     setName(response.data.name)
@@ -58,7 +59,6 @@ function ViewTrip({open, tripId, onClose, onTripUpdate}) {
                     setCategoryItemDetail1(response.data.categoryItemDetail1 ? response.data.categoryItemDetail1 : '')
                     setCategoryItemDetail2(response.data.categoryItemDetail2 ? response.data.categoryItemDetail2 : '')
                     setCategoryItemDetail3(response.data.categoryItemDetail3 ? response.data.categoryItemDetail3 : '')
-
                     if (response.data.activities) {
                         setTripActivities(response.data.activities)
                     }
@@ -66,7 +66,7 @@ function ViewTrip({open, tripId, onClose, onTripUpdate}) {
                         getParentTrip(response.data.parentTrip)
                     }
                 })
-            axios.get(`http://192.168.86.169:8090/trip/${tripId}/images`)
+            axios.get(`http://192.168.1.69:8090/trip/${tripId}/images?userIsMobile=${userIsMobile()}`)
                 .then(response => {
                     if (response.data.length <= 5) {
                         setImages(response.data);
@@ -74,11 +74,11 @@ function ViewTrip({open, tripId, onClose, onTripUpdate}) {
                         retrieveImage(response.data, 0, 12)
                     }
                 })
-            axios.get(`http://192.168.86.169:8090/trip/${tripId}/activities`)
+            axios.get(`http://192.168.1.69:8090/trip/${tripId}/activities`)
                 .then(response => {
                     setTripActivities(response.data)
                 })
-            axios.get(`http://192.168.86.169:8090/parentTrips`)
+            axios.get(`http://192.168.1.69:8090/parentTrips`)
                 .then(response => {
                     setParentTrips(response.data)
                 })
@@ -90,7 +90,7 @@ function ViewTrip({open, tripId, onClose, onTripUpdate}) {
     }, [open])
 
     const getParentTrip = parentTripName => {
-        axios.get(`http://192.168.86.169:8090/parentTrip`, {
+        axios.get(`http://192.168.1.69:8090/parentTrip`, {
             params: {
                 parentTripName: parentTripName
             }
@@ -109,9 +109,11 @@ function ViewTrip({open, tripId, onClose, onTripUpdate}) {
 
     function retrieveImage(imageList, index, indexToStopOn) {
         if (index < indexToStopOn && index < imageList.length) {
-            axios.get(`http://192.168.86.169:8090/image/${imageList[index].id}`)
+            axios.get(`http://192.168.1.69:8090/image/${imageList[index].id}?userIsMobile=${userIsMobile()}`)
                 .then(response => {
                     imageList[index].image_location = response.data.image_location
+                    imageList[index].videoCoverImage = response.data.videoCoverImage
+                    imageList[index].fileType = response.data.fileType
                     setImages([...imageList])
                     retrieveImage(imageList, index + 1, indexToStopOn)
                 })
@@ -121,7 +123,7 @@ function ViewTrip({open, tripId, onClose, onTripUpdate}) {
     }
 
     const retrieveImagesForChildTrip = tripId => {
-        axios.get(`http://192.168.86.169:8090/trip/${tripId}/images`)
+        axios.get(`http://192.168.1.69:8090/trip/${tripId}/images?userIsMobile=${userIsMobile()}`)
             .then(response => {
                 if (response.data.length <= 5) {
                     // const updatedImages = [...parentTripImages]
@@ -136,7 +138,7 @@ function ViewTrip({open, tripId, onClose, onTripUpdate}) {
 
     function retrieveImageForChildTrip(imageList, index) {
         if (index < imageList.length) {
-            axios.get(`http://192.168.86.169:8090/image/${imageList[index].id}`)
+            axios.get(`http://192.168.1.69:8090/image/${imageList[index].id}?userIsMobile=${userIsMobile()}`)
                 .then(response => {
                     imageList[index].image_location = response.data.image_location
                     setParentTripImages(currentParentTripImages => {
@@ -166,7 +168,7 @@ function ViewTrip({open, tripId, onClose, onTripUpdate}) {
     }
 
     const deleteTrip = () => {
-        axios.delete(`http://192.168.86.169:8090/trip/${id}`, {
+        axios.delete(`http://192.168.1.69:8090/trip/${tripId}`, {
             headers: {
                 "Access-Control-Allow-Origin": "*",
                 "Access-Control-Allow-Methods": "DELETE, POST, GET, OPTIONS",
@@ -190,7 +192,7 @@ function ViewTrip({open, tripId, onClose, onTripUpdate}) {
 
     const submitTrip = () => {
         if (tripId) {
-            axios.put(`http://192.168.86.169:8090/trip/${id ? id : tripId}`, {
+            axios.put(`http://192.168.1.69:8090/trip/${id ? id : tripId}`, {
                 name: name,
                 location: location,
                 startDate: startDate,
@@ -214,7 +216,7 @@ function ViewTrip({open, tripId, onClose, onTripUpdate}) {
                 console.log("Request complete! response:", res);
             });
         } else {
-            axios.post("http://192.168.86.169:8090/trip/create", {
+            axios.post("http://192.168.1.69:8090/trip/create", {
                 name: name,
                 location: location,
                 startDate: startDate,
@@ -228,7 +230,7 @@ function ViewTrip({open, tripId, onClose, onTripUpdate}) {
                     "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Requested-With",
                 }
             }).then(res => {
-                window.location.replace(`http://192.168.86.169:3000/trip/${res.data.id}`);
+                window.location.replace(`http://192.168.1.69:3000/trip/${res.data.id}`);
                 console.log("Request complete! response:", res);
             });
         }
@@ -253,7 +255,7 @@ function ViewTrip({open, tripId, onClose, onTripUpdate}) {
     }
 
     const submitImageActivities = () => {
-        axios.post(`http://192.168.86.169:8090/trip/${tripId}/activities`, {
+        axios.post(`http://192.168.1.69:8090/trip/${tripId}/activities`, {
             activityId: activityIdForImages,
             imageIds: imageIdsForActivity
         }, {
@@ -310,7 +312,7 @@ function ViewTrip({open, tripId, onClose, onTripUpdate}) {
         let index = 0
         reader.onloadend = function () {
             loadedImagesMap[`${index}`] = reader.result
-            axios.post(`http://192.168.86.169:8090/trip/${tripId}/images`, {
+            axios.post(`http://192.168.1.69:8090/trip/${tripId}/images`, {
                 fileType: reader.result.split(";")[0].replace("data:", "").replace("quicktime", "mp4"),
                 image: reader.result.split(",")[1],
                 description: `${index}`
@@ -453,7 +455,15 @@ function ViewTrip({open, tripId, onClose, onTripUpdate}) {
     }
 
     const locationActivityList = images.map(image => image?.activity?.location).filter(activityLocation => activityLocation)
-    const locationList = locationActivityList?.length > 0 ? locationActivityList : [location]
+    const locationActivitiesObj = {}
+    const filteredLocationActivityList = locationActivityList.filter(activityLocation => {
+        if (!locationActivitiesObj[activityLocation]){
+            locationActivitiesObj[activityLocation] = activityLocation
+            return true
+        }
+        return false
+    })
+    const locationList = filteredLocationActivityList?.length > 0 ? filteredLocationActivityList : [location]
     return (
         <ReactModal isOpen={open} className="view-trip-modal">
             <div>

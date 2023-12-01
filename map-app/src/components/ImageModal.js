@@ -1,6 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import ReactModal from 'react-modal';
 import axios from "axios";
+import {userIsMobile} from "./utils/utils";
 
 function ImageModal({open, modalImage, onClose, activities, imageActivity, editingTrip}) {
     const [imageDescription, setImageDescription] = useState(modalImage?.description ? modalImage?.description : "")
@@ -9,6 +10,16 @@ function ImageModal({open, modalImage, onClose, activities, imageActivity, editi
     const [activityLocation, setActivityLocation] = useState(modalImage?.activity?.location)
     const [activityId, setActivityId] = useState(modalImage?.activity?.id)
     const [editingImage, setEditingImage] = useState(false)
+    const [modalVideo, setModalVideo] = useState(null)
+
+    function retrieveImage() {
+        axios.get(`http://192.168.1.69:8090/image/${modalImage.id}?userIsMobile=${false}`)
+            .then(response => {
+                const fileType = response.data.fileType ? `data:${response.data.fileType};base64` : "data:image/jpeg;base64"
+                const imageUrl = response.data.image_location.includes("data:") ? response.data.image_location : `${fileType},${response.data.image_location}`
+                setModalVideo(imageUrl);
+            })
+    }
 
     useEffect(() => {
         if (modalImage) {
@@ -17,6 +28,9 @@ function ImageModal({open, modalImage, onClose, activities, imageActivity, editi
             setActivityName(modalImage?.activity?.name)
             setActivityLocation(modalImage?.activity?.location)
             setActivityId(modalImage?.activity?.id)
+            if (userIsMobile() && modalImage.videoCoverImage) {
+                retrieveImage()
+            }
         }
     }, [modalImage])
 
@@ -30,7 +44,7 @@ function ImageModal({open, modalImage, onClose, activities, imageActivity, editi
         setEditingImage(false)
     }
     const saveImage = () => {
-        axios.put(`http://192.168.86.169:8090/image/${modalImage.id}`, {
+        axios.put(`http://192.168.1.69:8090/image/${modalImage.id}`, {
             description: imageDescription,
             isProfilePicture: isProfilePicture ? true : false,
             activityId: activityId?.toString(),
@@ -47,7 +61,7 @@ function ImageModal({open, modalImage, onClose, activities, imageActivity, editi
     }
 
     const deleteImage = () => {
-        axios.delete(`http://192.168.86.169:8090/image/${modalImage.id}`)
+        axios.delete(`http://192.168.1.69:8090/image/${modalImage.id}`)
             .then(res => {
                 console.log("deleted image! response:", res);
             });
@@ -77,11 +91,11 @@ function ImageModal({open, modalImage, onClose, activities, imageActivity, editi
                 }}>
                     Close
                 </button>
-                {modalImage?.fileType?.includes("video") ? <video
-                        src={imageUrl}
+                {(modalImage?.fileType?.includes("video") || modalImage?.videoCoverImage) ? <video
+                        src={(userIsMobile() && modalImage.videoCoverImage) ? modalVideo : imageUrl}
                         controls autoPlay
                     /> :
-                    <img src={imageUrl} />
+                    <img src={imageUrl}/>
                 }
             </div>
             {editingImage ? <div>

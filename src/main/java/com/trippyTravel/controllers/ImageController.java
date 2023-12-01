@@ -8,12 +8,18 @@ import com.trippyTravel.repositories.ImageRepository;
 import com.trippyTravel.repositories.TripRepository;
 import com.trippyTravel.services.ImageService;
 import org.apache.tomcat.util.codec.binary.Base64;
+import org.bytedeco.javacv.FFmpegFrameGrabber;
+import org.bytedeco.javacv.Frame;
+import org.bytedeco.javacv.Java2DFrameConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -44,11 +50,9 @@ public class ImageController {
 
     @CrossOrigin
     @RequestMapping(value="/image/{id}", method=RequestMethod.GET, produces="application/json")
-    public @ResponseBody Image retrieveImageById(@PathVariable long id) throws IOException {
+    public @ResponseBody Image retrieveImageById(@PathVariable long id, @RequestParam boolean userIsMobile) throws IOException {
         Image image = imagesRepository.getOne(id);
-        String encodedImage = imageService.getEncodedImageFile(image);
-        image.setImage_location(encodedImage);
-        return image;
+        return imageService.addEncodedImageFileToImage(image, userIsMobile);
     }
 
     @CrossOrigin
@@ -98,13 +102,12 @@ public class ImageController {
     @CrossOrigin
     @RequestMapping(value="/trip/{id}/images", method=RequestMethod.GET, produces="application/json")
     public @ResponseBody
-    List<Image> retrieveTripImage(@PathVariable long id) throws IOException {
+    List<Image> retrieveTripImage(@PathVariable long id, @RequestParam boolean userIsMobile) throws IOException {
         List<Image> images = imagesRepository.findImagesByTrip(new Trip(id));
         if (images.size() <=5) {
             for (int i =0; i<images.size(); i = i+1) {
                 Image image = images.get(i);
-                String encodedImage = imageService.getEncodedImageFile(image);
-                image.setImage_location(encodedImage);
+                image = imageService.addEncodedImageFileToImage(image, userIsMobile);
                 images.set(i, image);
             }
         }
@@ -126,8 +129,25 @@ public class ImageController {
             destinationFileType = "%s.";
             destinationFileType += image.getFileType().split("/")[1];
         }
+
         Path destinationFIle = Paths.get("/Users/jimmiemcbride/Pictures/mapapp", String.format(destinationFileType, Long.toString(image.getId())));
         Files.write(destinationFIle, decodedImage);
+        if (image.getFileType().equals("video/mp4")) {
+            String fileName = "/Users/jimmiemcbride/Pictures/mapapp/" + image.getId();
+            FFmpegFrameGrabber g = new FFmpegFrameGrabber(fileName + ".mp4");
+            g.start();
+
+            Java2DFrameConverter converter = new Java2DFrameConverter();
+
+                Frame frame = g.grabImage(); // It is important to use grabImage() to get a frame that can be turned into a BufferedImage
+
+                BufferedImage bi = converter.convert(frame);
+
+                ImageIO.write(bi, "jpeg", new File( fileName  + ".jpeg"));
+
+            g.stop();
+
+        }
         return image;
     }
 

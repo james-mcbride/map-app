@@ -16,7 +16,7 @@ function CreateTrip({open, onClose, locations}) {
 
     useEffect(() => {
         if (open){
-            axios.get(`http://192.168.86.169:8090/parentTrips`)
+            axios.get(`http://192.168.1.69:8090/parentTrips`)
                 .then(response => {
                     setParentTrips(response.data)
                 })
@@ -24,7 +24,7 @@ function CreateTrip({open, onClose, locations}) {
     }, [open])
 
     const submitTrip = () => {
-        axios.post("http://192.168.86.169:8090/trip/create", {
+        axios.post("http://192.168.1.69:8090/trip/create", {
             name: name,
             location: location,
             startDate: startDate,
