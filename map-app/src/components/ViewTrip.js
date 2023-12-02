@@ -71,7 +71,7 @@ function ViewTrip({open, tripId, onClose, onTripUpdate}) {
                     if (response.data.length <= 5) {
                         setImages(response.data);
                     } else {
-                        retrieveImage(response.data, 0, 12)
+                        retrieveImage(response.data, 0, response.data.length)
                     }
                 })
             axios.get(`http://192.168.1.69:8090/trip/${tripId}/activities`)
@@ -376,9 +376,9 @@ function ViewTrip({open, tripId, onClose, onTripUpdate}) {
                 imageIdsForNewActivity={imageIdsForActivity}
                 key={image.id}
                 imageIsInView={() => {
-                    if (lastImageIndexRetrieved - index === 4) {
-                        retrieveImage(images, lastImageIndexRetrieved, lastImageIndexRetrieved + 8)
-                    }
+                    // if (lastImageIndexRetrieved - index === 4) {
+                    //     retrieveImage(images, lastImageIndexRetrieved, lastImageIndexRetrieved + 8)
+                    // }
                 }
                 }/>
         })
