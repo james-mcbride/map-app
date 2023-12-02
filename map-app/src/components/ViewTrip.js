@@ -312,14 +312,16 @@ function ViewTrip({open, tripId, onClose, onTripUpdate}) {
         let index = 0
         reader.onloadend = function () {
             loadedImagesMap[`${index}`] = reader.result
-            axios.post(`http://192.168.1.69:8090/trip/${tripId}/images`, {
+            axios.post(`http://192.168.1.69:8090/trip/${tripId}/images?userIsMobile=${userIsMobile()}`, {
                 fileType: reader.result.split(";")[0].replace("data:", "").replace("quicktime", "mp4"),
                 image: reader.result.split(",")[1],
                 description: `${index}`
             })
                 .then(res => {
                     const image = res.data
-                    image.image_location = loadedImagesMap[image.description]?.replace("data:image/jpeg;base64,", "")
+                    if (!image.videoCoverImage){
+                        image.image_location = loadedImagesMap[image.description]?.replace("data:image/jpeg;base64,", "")
+                    }
                     loadedImages.unshift(image)
                     setImages([...loadedImages])
                 })

@@ -1,5 +1,6 @@
 import React, {useEffect, useRef, useState} from "react";
 import VisibilitySensor from 'react-visibility-sensor';
+import playButton from './images/play-button-svgrepo-com.svg'
 
 function Image({imageFile, editImage, imageIdsForNewActivity, imageIsInView}) {
     const [imageUrl, setImageUrl] = useState("")
@@ -40,25 +41,29 @@ function Image({imageFile, editImage, imageIdsForNewActivity, imageIsInView}) {
 
     return (
         <VisibilitySensor partialVisibility onChange={(isVisible) => {
-            if (typeof imageIsInView == 'function' ){
+            if (typeof imageIsInView == 'function') {
                 imageIsInView()
             }
             setIsVisible(isVisible)
         }}
         >
 
-                <div className="view-trip-image-div"  onClick={() => editImage(imageFile)}>
-                    {imageFile.fileType?.includes("video") ? <video
-                            src={imageUrl} className="view-trip-image"
-                            style={imageIdsForNewActivity.includes(imageFile.id) ? {opacity: 0.5} : {}}
-                            controls
-                            ref={videoRef}
-                            preload="metadata"
-                        /> :
-                        <img src={isVisible ? imageUrl : ""} className="view-trip-image"
-                             style={style}/>
-                    }
-                </div>
+            <div className="view-trip-image-div" onClick={() => editImage(imageFile)}>
+                {imageFile?.videoCoverImage ? (<div className="play-button">
+                    <img src={playButton}/>
+                </div>) : null}
+
+                {imageFile.fileType?.includes("video") ? <video
+                        src={imageUrl} className="view-trip-image"
+                        style={imageIdsForNewActivity.includes(imageFile.id) ? {opacity: 0.5} : {}}
+                        controls
+                        ref={videoRef}
+                        preload="metadata"
+                    /> :
+                    <img src={isVisible ? imageUrl : ""} className="view-trip-image"
+                         style={style}/>
+                }
+            </div>
         </VisibilitySensor>
     )
 }

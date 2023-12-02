@@ -84,6 +84,18 @@ button {
 }
 
 .view-trip-image-div {
+  .play-button {
+    position: absolute;
+    right: 5px;
+    top: 5px;
+    img {
+      width: calc((100vw - 70px)/9);
+      height: calc((100vw - 70px)/9);
+      fill: white;
+
+    }
+  }
+  position: relative;
   padding: 1px;
 }
 

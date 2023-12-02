@@ -118,7 +118,7 @@ public class ImageController {
     @CrossOrigin
     @RequestMapping(value="/trip/{id}/images", method= RequestMethod.POST, produces="application/json")
     public @ResponseBody
-    Image saveImages(@PathVariable long id, @RequestBody HashMap<String, Object> data, HttpServletRequest httpServletRequest) throws IOException {
+    Image saveImages(@PathVariable long id, @RequestBody HashMap<String, Object> data, HttpServletRequest httpServletRequest, @RequestParam boolean userIsMobile) throws IOException {
         Trip trip= tripRepository.getOne(id);
         String fileType = (String) data.get("fileType");
         Image image = imagesRepository.save(new Image(trip, fileType));
@@ -144,10 +144,15 @@ public class ImageController {
                 BufferedImage bi = converter.convert(frame);
 
                 ImageIO.write(bi, "jpeg", new File( fileName  + ".jpeg"));
+                image.setVideoCoverImage(true);
 
             g.stop();
 
         }
+        if (userIsMobile && image.isVideoCoverImage()) {
+            return imageService.addEncodedImageFileToImage(image, userIsMobile);
+        }
+        image.setVideoCoverImage(false);
         return image;
     }
 
